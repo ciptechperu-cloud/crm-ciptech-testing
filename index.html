@@ -400,7 +400,7 @@
 
   <script>
 
-    const URL = "https://script.google.com/macros/s/AKfycbx0AaR49Zzzju_eQFsFkzj7TEX2tdybmUPB3nzrjsrvzKgovULcY5TWIrazpK0ssTrR/exec";
+    const URL = "https://script.google.com/macros/s/AKfycbxTQ8wuz55hb3IBOLu7sVImBgunt-YtomK_WvP0weWu-ItnJPS2iUQvKgPVhssuCCKJ/exec";
 
     let leadActivo = null
 
@@ -775,6 +775,17 @@
 
       //Sección de CERRADO
       if (estadoPost == "CERRADO") {
+        const cotSeleccionada = document.getElementById("listaCotizaciones").value;
+        const ovDeOtraCot = (window.historialLead || []).find(x =>
+          String(x.numOV || "").trim() !== "" &&
+          String(x.numCot || "").trim() !== String(cotSeleccionada).trim()
+        );
+        if (ovDeOtraCot && !ovsDeCotizacion(cotSeleccionada).length) {
+          alert("Este lead ya tiene la OV N° " + ovDeOtraCot.numOV +
+            " vinculada a la cotización N° " + ovDeOtraCot.numCot +
+            ". No se permite registrar una segunda OV.");
+          return;
+        }
 
         const numCot = document.getElementById("listaCotizaciones").value || document.getElementById("numCot").value
         if (!numCot || numCot === "") {
@@ -1162,9 +1173,53 @@
 
       })
 
+    // Mantener la OV vinculada exclusivamente a su cotización de referencia.
+    function limpiarOVSeleccionada() {
+      const lista = document.getElementById("listaOV");
+      lista.innerHTML = "";
+      lista.style.display = "none";
+      ["monedaOV", "montoOV", "numOV"].forEach(id => {
+        const campo = document.getElementById(id);
+        campo.value = "";
+        campo.readOnly = false;
+      });
+      document.getElementById("bloqueOV").style.display = "none";
+    }
+
+    function ovsDeCotizacion(numCot) {
+      return (window.historialLead || []).filter(x =>
+        String(x.numCot || "").trim() === String(numCot || "").trim() &&
+        String(x.numOV || "").trim() !== ""
+      );
+    }
+
+    function prepararOVCotizacion(numCot) {
+      limpiarOVSeleccionada();
+      const lista = document.getElementById("listaOV");
+      const registros = ovsDeCotizacion(numCot);
+      const numeros = [...new Set(registros.map(x => String(x.numOV).trim()))];
+      if (numeros.length) {
+        lista.add(new Option("N° de Orden de Venta", ""));
+        numeros.forEach(n => lista.add(new Option(n, n)));
+        lista.style.display = "block";
+      } else {
+        // Si el lead ya tiene una OV en otra cotización, no precargarla.
+        const tieneOVEnOtraCot = (window.historialLead || []).some(x =>
+          String(x.numOV || "").trim() !== "" &&
+          String(x.numCot || "").trim() !== String(numCot || "").trim()
+        );
+        if (tieneOVEnOtraCot) {
+          lista.add(new Option("Esta cotización no tiene OV", ""));
+          lista.style.display = "block";
+        }
+      }
+    }
+
     document.getElementById("listaCotizaciones").addEventListener("change", function () {
 
       const num = this.value
+      limpiarOVSeleccionada();
+      document.getElementById("estadoPostCot").value = "";
 
       // 🔥 SI ESTÁ EN DEFAULT → OCULTAR TODO
       if (num === "") {
@@ -1219,39 +1274,9 @@
           // estado al final
           document.getElementById("estadoPostCot").style.display = "block"
 
-          // ===== CARGAR OVS AUTOMÁTICAMENTE =====
-          const selOV = document.getElementById("listaOV")
-          selOV.innerHTML = ""
+          // Solo OV vinculadas a esta cotización.
+          prepararOVCotizacion(num);
 
-          const ovs = (window.dataOVs && window.dataOVs[num]) || []
-
-          if (ovs.length > 0) {
-
-            let op0 = document.createElement("option")
-            op0.text = "N° de Orden de Venta"
-            op0.value = ""
-            selOV.add(op0)
-
-            ovs.forEach(o => {
-              let op = document.createElement("option")
-              op.text = o
-              op.value = o
-              selOV.add(op)
-            })
-
-            let opNew = document.createElement("option")
-            opNew.text = "Nueva Orden de Venta"
-            opNew.value = "NEW"
-            selOV.add(opNew)
-
-            selOV.style.display = "block"
-
-          } else {
-            selOV.style.display = "none"
-          }
-          if (document.getElementById("estadoPostCot").value === "CERRADO") {
-            document.getElementById("bloqueOV").style.display = "block"
-          }
         }
 
       }
@@ -1271,6 +1296,29 @@
       }
 
       if (estado === "CERRADO") {
+        const cotSeleccionada = document.getElementById("listaCotizaciones").value;
+        if (!cotSeleccionada || cotSeleccionada === "NEW") {
+          alert("Seleccione una cotización existente antes de cerrar.");
+          this.value = "";
+          return;
+        }
+        prepararOVCotizacion(cotSeleccionada);
+        const ovsActuales = ovsDeCotizacion(cotSeleccionada);
+        const otraOV = (window.historialLead || []).find(x =>
+          String(x.numOV || "").trim() !== "" &&
+          String(x.numCot || "").trim() !== String(cotSeleccionada).trim()
+        );
+        if (!ovsActuales.length && otraOV) {
+          alert("Este lead ya tiene la orden de venta N° " + otraOV.numOV +
+            " vinculada a la cotización N° " + otraOV.numCot +
+            ". No se permite registrar una segunda OV para el mismo lead.");
+          this.value = "";
+          return;
+        }
+        if (ovsActuales.length === 1) {
+          document.getElementById("listaOV").value = String(ovsActuales[0].numOV).trim();
+          document.getElementById("listaOV").dispatchEvent(new Event("change"));
+        }
 
         document.getElementById("bloqueCotizacion").style.display = "none"
         document.getElementById("bloqueOV").style.display = "block"
@@ -1313,7 +1361,8 @@
       }
 
       const ov = window.historialLead.find(x =>
-        String(x.numOV).trim() === String(numOV).trim()
+        String(x.numOV).trim() === String(numOV).trim() &&
+        String(x.numCot).trim() === String(document.getElementById("listaCotizaciones").value).trim()
       )
 
       if (ov) {
