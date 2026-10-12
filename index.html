@@ -400,7 +400,7 @@
 
   <script>
 
-    const URL = "https://script.google.com/macros/s/AKfycbxTQ8wuz55hb3IBOLu7sVImBgunt-YtomK_WvP0weWu-ItnJPS2iUQvKgPVhssuCCKJ/exec";
+    const URL = "https://script.google.com/macros/s/AKfycbzjZeakXQZ9KT15rvJ4IXtPXiVkpKNG_dvnT1xKRz5mt8t0PjZOAzMQrUgpp5Bxj_Ha/exec";
 
     let leadActivo = null
 
@@ -518,6 +518,7 @@
       document.getElementById("bloquePerdido").style.display = "none"
 
       document.getElementById("msgOk").style.display = "none"
+      document.getElementById("motivoPerdido").value = ""
       document.getElementById("estadoPostCot").value = ""
 
       // 🔥 FALTANTES (CLAVE)
@@ -1068,6 +1069,7 @@
       document.getElementById("info").style.display = "none"
       document.getElementById("estado").innerHTML = ""
       document.getElementById("msgOk").style.display = "none"
+      document.getElementById("motivoPerdido").value = ""
 
       window.historialLead = []
       window.dataOVs = {}
