@@ -400,7 +400,7 @@
 
   <script>
 
-    const URL = "https://script.google.com/macros/s/AKfycbxz6j6Lv7jLMlN7QaoANHMZq-c6CekVmh86K4Da3eCj8toV7DLv9deF2xssknszyNcO/exec";
+    const URL = "https://script.google.com/macros/s/AKfycbxTQ8wuz55hb3IBOLu7sVImBgunt-YtomK_WvP0weWu-ItnJPS2iUQvKgPVhssuCCKJ/exec";
 
     let leadActivo = null
 
@@ -491,6 +491,9 @@
       if (crmPeticionActiva) return;
 
       const id = document.getElementById("idLead").value.trim()
+      const __crmInicioBusqueda = performance.now();
+      let __crmRespuestaHTTP = 0;
+      let __crmJSONListo = 0;
 
       if (!id) {
         alert("Ingrese ID")
@@ -530,9 +533,15 @@
 
       crmFetch(URL + "?accion=consultar&id=" + encodeURIComponent(id))
 
-        .then(r => r.json())
+        .then(r => {
+          __crmRespuestaHTTP = performance.now();
+          console.log("[CRM MEDICIÓN] 1. Respuesta HTTP: " + Math.round(__crmRespuestaHTTP - __crmInicioBusqueda) + " ms");
+          return r.json();
+        })
 
         .then(data => {
+          __crmJSONListo = performance.now();
+          console.log("[CRM MEDICIÓN] 2. Lectura y análisis JSON: " + Math.round(__crmJSONListo - __crmRespuestaHTTP) + " ms");
 
           document.getElementById("loader").style.display = "none"
 
@@ -564,6 +573,9 @@
 
           pintarLead(data)
           crmMensaje("Lead cargado correctamente.", "success")
+          const __crmFinBusqueda = performance.now();
+          console.log("[CRM MEDICIÓN] 3. Procesamiento de interfaz: " + Math.round(__crmFinBusqueda - __crmJSONListo) + " ms");
+          console.log("[CRM MEDICIÓN] 4. TOTAL hasta ficha preparada: " + Math.round(__crmFinBusqueda - __crmInicioBusqueda) + " ms");
 
         })
 
