@@ -441,12 +441,14 @@
     function crmFetch(url, opciones) {
       const esConsulta = !opciones || !opciones.method || opciones.method.toUpperCase() === "GET";
       crmEspera(true, esConsulta);
+      const __crmInicioFetch = performance.now();
       return fetch(url, opciones)
         .then(respuesta => {
           if (!respuesta.ok) throw new Error("HTTP " + respuesta.status);
           return respuesta;
         })
         .finally(() => {
+          console.log("[CRM TIEMPO NAVEGADOR] " + (esConsulta ? "consulta" : "guardado") + ": " + Math.round(performance.now() - __crmInicioFetch) + " ms");
           crmEspera(false, esConsulta);
           // La confirmación de guardado depende de resp.ok, nunca del fin del fetch.
           if (!esConsulta) crmMensaje("", "info");
