@@ -400,7 +400,7 @@
 
   <script>
 
-    const URL = "https://script.google.com/macros/s/AKfycbzjZeakXQZ9KT15rvJ4IXtPXiVkpKNG_dvnT1xKRz5mt8t0PjZOAzMQrUgpp5Bxj_Ha/exec";
+    const URL = "https://script.google.com/macros/s/AKfycbxTQ8wuz55hb3IBOLu7sVImBgunt-YtomK_WvP0weWu-ItnJPS2iUQvKgPVhssuCCKJ/exec";
 
     let leadActivo = null
 
@@ -582,6 +582,21 @@
       document.getElementById("zonaGestion").style.display = "block"
 
       let estado = data.estado
+
+      // La opción PERDIDO nunca debe aparecer si el lead ya tiene una OV.
+      // Se reconstruye el desplegable al consultar cada lead para evitar opciones heredadas.
+      const tieneOVRegistrada = (data.historial || []).some(registro =>
+        String(registro.numOV == null ? "" : registro.numOV).trim() !== ""
+      );
+      const selectorPostCot = document.getElementById("estadoPostCot");
+      selectorPostCot.innerHTML = "";
+      selectorPostCot.add(new Option("Seleccionar Estado", ""));
+      selectorPostCot.add(new Option("CERRADO", "CERRADO"));
+      if (!tieneOVRegistrada && estado !== "CERRADO" && estado !== "PERDIDO") {
+        selectorPostCot.add(new Option("PERDIDO", "PERDIDO"));
+      }
+      selectorPostCot.value = "";
+      document.getElementById("motivoPerdido").value = "";
 
       // 🔴 PRIORIDAD ABSOLUTA: PERDIDO
       estado = data.estado
