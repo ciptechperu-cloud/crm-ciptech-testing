@@ -357,7 +357,7 @@
             <option>USD</option>
           </select>
 
-          <input id="montoCot" placeholder="Monto de Cotización">
+          <input id="montoCot" placeholder="Monto de Cotización" type="text" inputmode="decimal" autocomplete="off">
 
           <input id="numCot" placeholder="N° de Cotización" type="text" inputmode="numeric" pattern="[0-9]+" autocomplete="off">
 
@@ -381,7 +381,7 @@
             <option>PEN</option>
             <option>USD</option>
           </select>
-          <input id="montoOV" placeholder="Monto de Cierre">
+          <input id="montoOV" placeholder="Monto de Cierre" type="text" inputmode="decimal" autocomplete="off">
           <input id="numOV" placeholder="N° Orden de Venta" type="text" inputmode="numeric" pattern="[0-9]+" autocomplete="off">
         </div>
 
@@ -463,6 +463,26 @@
         this.setCustomValidity(numeroDocumentoValido(this.value) || !this.value ? "" : "Ingrese únicamente números (0-9).");
       });
     });
+
+    // Validación de entrada: documentos enteros y montos decimales positivos.
+    ["numCot", "numOV"].forEach(id => {
+      document.getElementById(id).addEventListener("input", function () {
+        if (this.readOnly) return;
+        this.value = this.value.replace(/[^0-9]/g, "");
+        this.setCustomValidity("");
+      });
+    });
+    ["montoCot", "montoOV"].forEach(id => {
+      document.getElementById(id).addEventListener("input", function () {
+        const limpio = this.value.replace(/[^0-9.,]/g, "");
+        const partes = limpio.replace(/,/g, ".").split(".");
+        this.value = partes[0] + (partes.length > 1 ? "." + partes.slice(1).join("").slice(0, 2) : "");
+      });
+    });
+    function crmMontoValido(valor) {
+      const texto = String(valor == null ? "" : valor).trim().replace(",", ".");
+      return /^(?:[0-9]+)(?:\.[0-9]{1,2})?$/.test(texto) && Number(texto) > 0 && Number.isFinite(Number(texto));
+    }
 
     //FUNCIÓN BUSCAR - CONSULTA DE LEADS
     function buscar() {
@@ -774,6 +794,11 @@
           return
         }
 
+        if (!crmMontoValido(montoOV)) {
+          alert("El monto de cierre debe ser mayor a cero y tener como máximo 2 decimales.");
+          return;
+        }
+
         const selOV = document.getElementById("listaOV").value
 
         const numOVFinal = selOV && selOV !== "NEW"
@@ -837,7 +862,7 @@
 
         let montoLimpio = monto.replace(",", ".").trim()
 
-        if (isNaN(montoLimpio) || montoLimpio === "") {
+        if (!crmMontoValido(monto)) {
           alert("Monto inválido")
 
           document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
