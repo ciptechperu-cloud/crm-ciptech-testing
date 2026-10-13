@@ -400,9 +400,10 @@
 
   <script>
 
-    const URL = "https://script.google.com/macros/s/AKfycbxiX3r6gK4gZeiqqRQgpO45bXDjCeKrnvjOG97-xVaT0rrawCxN1lkHBCFWy2wvABdI/exec";
+    const URL = "https://script.google.com/macros/s/AKfycbzxUppER14qOBq1mEgCHPRJ-IreL1Lyuz5b1o9SnqwbYJiQkltASHI_RuRLdyS0Ouk/exec";
 
     let leadActivo = null
+    let filaLeadActiva = null
 
     // ETAPA 1: controles de espera. No modifica los datos enviados al Apps Script.
     let crmPeticionActiva = false;
@@ -502,6 +503,7 @@
 
       document.getElementById("loader").style.display = "block"
 
+      filaLeadActiva = null;
       // 🔥 RESET TOTAL UI + MEMORIA
       window.historialLead = []
       window.dataOVs = {}
@@ -555,6 +557,7 @@
           window.dataOVs = data.ovs
 
           leadActivo = id
+          filaLeadActiva = Number.isInteger(Number(data.lead.fila)) ? Number(data.lead.fila) : null;
 
           // BLOQUEAR ID
           document.getElementById("idLead").readOnly = true
@@ -972,6 +975,7 @@
           body: JSON.stringify({
             accion: "cotizar",
             id: id,
+            filaLead: filaLeadActiva,
             asesor: asesor || null,
             moneda: moneda,
             monto: montoLimpio,
@@ -1089,6 +1093,7 @@
       document.getElementById("loader").style.display = "none";
 
       leadActivo = null
+      filaLeadActiva = null
 
       document.getElementById("idLead").readOnly = false
       document.getElementById("idLead").value = ""
