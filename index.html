@@ -400,7 +400,7 @@
 
   <script>
 
-    const URL = "https://script.google.com/macros/s/AKfycbzxUppER14qOBq1mEgCHPRJ-IreL1Lyuz5b1o9SnqwbYJiQkltASHI_RuRLdyS0Ouk/exec";
+    const URL = "https://script.google.com/macros/s/AKfycbxEJlZmVhSxYvgxRqzz4FL6cR4rCcUig2WWVlwkLDFBm6U3W7yFoTcHt-0yfcQ8yclI/exec";
 
     let leadActivo = null
     let filaLeadActiva = null
@@ -557,7 +557,8 @@
           window.dataOVs = data.ovs
 
           leadActivo = id
-          filaLeadActiva = Number.isInteger(Number(data.lead.fila)) ? Number(data.lead.fila) : null;
+          filaLeadActiva = data.lead.fila != null && data.lead.fila !== "" && Number.isInteger(Number(data.lead.fila)) && Number(data.lead.fila) >= 2 ? Number(data.lead.fila) : null;
+          console.log("[CRM ETAPA 4.1] Fila recibida en consulta:", data.lead.fila, "| Fila enviada al guardar:", filaLeadActiva);
 
           // BLOQUEAR ID
           document.getElementById("idLead").readOnly = true
