@@ -223,26 +223,34 @@
       color: #123E7A;
     }
 
-    .msgOk {
-      background: #6fd14b;
-      color: white;
-      padding: 14px;
-      margin-top: 15px;
+    /* ESTADO DE CARGA CRM */
+    .crm-status {
+      display: none;
+      margin: 14px 0 0;
+      padding: 12px 14px;
       border-radius: 12px;
-      text-align: center;
-      font-weight: 600;
+      background: #edf3fb;
+      color: #123e7a;
+      font-size: 14px;
+      line-height: 1.4;
+      text-align: left;
     }
 
-    /* ETAPA 1: feedback visual y accesibilidad */
-    .crm-status { display:none; margin:14px 0 0; padding:12px 14px; border-radius:12px;
-      background:#edf3fb; color:#123e7a; font-size:14px; line-height:1.4; text-align:left; }
-    .crm-status[data-type="error"] { background:#fff0f0; color:#a32424; }
-    .crm-status[data-type="success"] { background:#ecf8e9; color:#256a29; }
-    button:disabled { opacity:.68; cursor:wait; transform:none !important; }
-    input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
-      outline:3px solid #7ed957; outline-offset:2px;
+    .crm-status[data-type="error"] {
+      background: #fff0f0;
+      color: #a32424;
     }
-    @media (prefers-reduced-motion: reduce) { .spinner { animation-duration:1.8s; } }
+
+    .crm-status[data-type="success"] {
+      background: #ecf8e9;
+      color: #256a29;
+    }
+
+    button:disabled {
+      opacity: 0.68;
+      cursor: wait;
+      transform: none !important;
+    }
 
     /* MOBILE FULL APP */
 
@@ -291,6 +299,7 @@
       </div>
 
       <div id="crmStatus" class="crm-status" role="status" aria-live="polite"></div>
+
       <div id="info" class="box"></div>
       <div id="estado" class="estado"></div>
 
@@ -357,9 +366,9 @@
             <option>USD</option>
           </select>
 
-          <input id="montoCot" placeholder="Monto de Cotización" type="text" inputmode="decimal" autocomplete="off">
+          <input id="montoCot" placeholder="Monto de Cotización">
 
-          <input id="numCot" placeholder="N° de Cotización" type="text" inputmode="numeric" pattern="[0-9]+" autocomplete="off">
+          <input id="numCot" placeholder="N° de Cotización">
 
         </div>
 
@@ -381,17 +390,13 @@
             <option>PEN</option>
             <option>USD</option>
           </select>
-          <input id="montoOV" placeholder="Monto de Cierre" type="text" inputmode="decimal" autocomplete="off">
-          <input id="numOV" placeholder="N° Orden de Venta" type="text" inputmode="numeric" pattern="[0-9]+" autocomplete="off">
+          <input id="montoOV" placeholder="Monto de Cierre">
+          <input id="numOV" placeholder="N° Orden de Venta">
         </div>
 
 
 
         <button class="btnGuardar" onclick="guardar()">Guardar Cambios</button>
-        <div id="msgOk" class="msgOk" style="display:none">
-          Se guardó con éxito
-        </div>
-
       </div>
 
     </div>
@@ -400,196 +405,150 @@
 
   <script>
 
-    const URL = "https://script.google.com/macros/s/AKfycbymjhSVRSa3KIekqlyK4g36dQQ-lwJWTesBcpSZbRUziuysdl7Z9qGT-yW1F5qLJLU7/exec";
+    const URL = "https://script.google.com/macros/s/AKfycbxLeAdRYsXPRmqvVGM6zoQIaydArRWuGKJg1GFo9BGqorFI0RFMOBEW48hb0XEmlemayA/exec";
 
     let leadActivo = null
-    let filaLeadActiva = null
 
-    // ETAPA 1: controles de espera. No modifica los datos enviados al Apps Script.
-    let crmPeticionActiva = false;
-    const crmBtnBuscar = document.getElementById("btnBuscarLead");
-    const crmBtnGuardar = document.querySelector(".btnGuardar");
-    const crmBtnNueva = document.getElementById("btnBuscarMini");
-    const crmTextosBotones = {
-      buscar: crmBtnBuscar.textContent,
-      guardar: crmBtnGuardar.textContent
-    };
+    let crmBuscando = false;
+
+    let crmGuardando = false;
+
+    function crmEstadoGuardado(activo) {
+      const boton = document.querySelector(".btnGuardar");
+
+      crmGuardando = activo;
+      boton.disabled = activo;
+      boton.textContent = activo ? "Guardando..." : "Guardar Cambios";
+
+      if (activo) {
+        crmMensaje(
+          "Guardando los cambios. No cierres esta ventana.",
+          "info"
+        );
+      }
+    }
 
     function crmMensaje(texto, tipo = "info") {
       const elemento = document.getElementById("crmStatus");
+
       elemento.textContent = texto;
       elemento.dataset.type = tipo;
       elemento.style.display = texto ? "block" : "none";
     }
 
-    function crmEspera(activa, esConsulta) {
-      crmPeticionActiva = activa;
-      crmBtnBuscar.disabled = activa;
-      crmBtnGuardar.disabled = activa;
-      crmBtnNueva.disabled = activa;
-      document.getElementById("idLead").disabled = activa;
+    function crmEstadoBusqueda(activa) {
+      crmBuscando = activa;
+
+      const boton = document.getElementById("btnBuscarLead");
+      const campo = document.getElementById("idLead");
+
+      boton.disabled = activa;
+      campo.disabled = activa;
+
+      boton.textContent = activa ? "Buscando..." : "Buscar lead";
+
       if (activa) {
-        if (esConsulta) crmBtnBuscar.textContent = "Buscando...";
-        else crmBtnGuardar.textContent = "Guardando...";
-        crmMensaje(esConsulta ? "Buscando el lead, por favor espera..." :
-          "Registrando los cambios. No cierres esta ventana...", "info");
-      } else {
-        crmBtnBuscar.textContent = crmTextosBotones.buscar;
-        crmBtnGuardar.textContent = crmTextosBotones.guardar;
+        crmMensaje("Buscando el lead, por favor espera...", "info");
       }
-    }
-
-    function crmFetch(url, opciones) {
-      const esConsulta = !opciones || !opciones.method || opciones.method.toUpperCase() === "GET";
-      crmEspera(true, esConsulta);
-      const __crmInicioFetch = performance.now();
-      return fetch(url, opciones)
-        .then(respuesta => {
-          if (!respuesta.ok) throw new Error("HTTP " + respuesta.status);
-          return respuesta;
-        })
-        .finally(() => {
-          console.log("[CRM TIEMPO NAVEGADOR] " + (esConsulta ? "consulta" : "guardado") + ": " + Math.round(performance.now() - __crmInicioFetch) + " ms");
-          crmEspera(false, esConsulta);
-          // La confirmación de guardado depende de resp.ok, nunca del fin del fetch.
-          if (!esConsulta) crmMensaje("", "info");
-        });
-    }
-
-
-    // Validación documental: conservar el valor como texto (incluidos ceros iniciales).
-    function numeroDocumentoValido(valor) {
-      return /^[0-9]+$/.test(String(valor == null ? "" : valor).trim());
-    }
-    ["numCot", "numOV"].forEach(id => {
-      document.getElementById(id).addEventListener("input", function () {
-        this.setCustomValidity(numeroDocumentoValido(this.value) || !this.value ? "" : "Ingrese únicamente números (0-9).");
-      });
-    });
-
-    // Validación de entrada: documentos enteros y montos decimales positivos.
-    ["numCot", "numOV"].forEach(id => {
-      document.getElementById(id).addEventListener("input", function () {
-        if (this.readOnly) return;
-        this.value = this.value.replace(/[^0-9]/g, "");
-        this.setCustomValidity("");
-      });
-    });
-    ["montoCot", "montoOV"].forEach(id => {
-      document.getElementById(id).addEventListener("input", function () {
-        const limpio = this.value.replace(/[^0-9.,]/g, "");
-        const partes = limpio.replace(/,/g, ".").split(".");
-        this.value = partes[0] + (partes.length > 1 ? "." + partes.slice(1).join("").slice(0, 2) : "");
-      });
-    });
-    function crmMontoValido(valor) {
-      const texto = String(valor == null ? "" : valor).trim().replace(",", ".");
-      return /^(?:[0-9]+)(?:\.[0-9]{1,2})?$/.test(texto) && Number(texto) > 0 && Number.isFinite(Number(texto));
     }
 
     //FUNCIÓN BUSCAR - CONSULTA DE LEADS
-    function buscar() {
-      if (crmPeticionActiva) return;
 
-      const id = document.getElementById("idLead").value.trim()
-      const __crmInicioBusqueda = performance.now();
-      let __crmRespuestaHTTP = 0;
-      let __crmJSONListo = 0;
+    function buscar() {
+
+      if (crmBuscando) return;
+
+      const id = document.getElementById("idLead").value.trim();
 
       if (!id) {
-        alert("Ingrese ID")
-        return
+        crmMensaje("Ingresa un ID de lead para realizar la búsqueda.", "error");
+        document.getElementById("idLead").focus();
+        return;
       }
 
-      document.getElementById("loader").style.display = "block"
+      crmEstadoBusqueda(true);
+      document.getElementById("loader").style.display = "block";
 
-      filaLeadActiva = null;
-      // 🔥 RESET TOTAL UI + MEMORIA
-      window.historialLead = []
-      window.dataOVs = {}
+      // RESET TOTAL UI + MEMORIA
+      window.historialLead = [];
+      window.dataOVs = {};
 
-      document.getElementById("listaCotizaciones").innerHTML = ""
-      document.getElementById("listaOV").innerHTML = ""
+      document.getElementById("listaCotizaciones").innerHTML = "";
+      document.getElementById("listaOV").innerHTML = "";
 
-      document.getElementById("monedaCot").value = ""
-      document.getElementById("montoCot").value = ""
-      document.getElementById("numCot").value = ""
-      document.getElementById("numCot").readOnly = false
+      document.getElementById("monedaCot").value = "";
+      document.getElementById("montoCot").value = "";
+      document.getElementById("numCot").value = "";
 
-      document.getElementById("monedaOV").value = ""
-      document.getElementById("montoOV").value = ""
-      document.getElementById("numOV").value = ""
+      document.getElementById("monedaOV").value = "";
+      document.getElementById("montoOV").value = "";
+      document.getElementById("numOV").value = "";
 
-      document.getElementById("bloqueCotizacion").style.display = "none"
-      document.getElementById("bloqueOV").style.display = "none"
-      document.getElementById("bloquePerdido").style.display = "none"
+      document.getElementById("bloqueCotizacion").style.display = "none";
+      document.getElementById("bloqueOV").style.display = "none";
+      document.getElementById("bloquePerdido").style.display = "none";
 
-      document.getElementById("msgOk").style.display = "none"
-      document.getElementById("motivoPerdido").value = ""
-      document.getElementById("estadoPostCot").value = ""
+      document.getElementById("estadoPostCot").value = "";
 
-      // 🔥 FALTANTES (CLAVE)
-      document.getElementById("estadoAvanzado").value = ""
-      document.getElementById("estadoInicial").value = ""
-      document.getElementById("asesor").value = ""
+      document.getElementById("estadoAvanzado").value = "";
+      document.getElementById("estadoInicial").value = "";
+      document.getElementById("asesor").value = "";
 
-      crmFetch(URL + "?accion=consultar&id=" + encodeURIComponent(id))
+      fetch(URL + "?accion=consultar&id=" + encodeURIComponent(id))
 
         .then(r => {
-          __crmRespuestaHTTP = performance.now();
-          console.log("[CRM MEDICIÓN] 1. Respuesta HTTP: " + Math.round(__crmRespuestaHTTP - __crmInicioBusqueda) + " ms");
+          if (!r.ok) throw new Error("HTTP " + r.status);
           return r.json();
         })
 
         .then(data => {
-          __crmJSONListo = performance.now();
-          console.log("[CRM MEDICIÓN] 2. Lectura y análisis JSON: " + Math.round(__crmJSONListo - __crmRespuestaHTTP) + " ms");
-
-          document.getElementById("loader").style.display = "none"
 
           if (!data || !data.lead) {
-            crmMensaje("No se encontró un lead con ese ID. Verifica el código.", "error")
-            alert("Lead no encontrado")
-            return
+            crmMensaje("No se encontró un lead con el ID ingresado.", "error");
+            return;
           }
 
-          window.historialLead = data.historial
-          window.dataOVs = data.ovs
+          window.historialLead = data.historial;
+          window.dataOVs = data.ovs;
 
-          leadActivo = id
-          filaLeadActiva = data.lead.fila != null && data.lead.fila !== "" && Number.isInteger(Number(data.lead.fila)) && Number(data.lead.fila) >= 2 ? Number(data.lead.fila) : null;
-          console.log("[CRM ETAPA 4.1] Fila recibida en consulta:", data.lead.fila, "| Fila enviada al guardar:", filaLeadActiva);
+          leadActivo = id;
 
           // BLOQUEAR ID
-          document.getElementById("idLead").readOnly = true
+          document.getElementById("idLead").readOnly = true;
 
           // BOTONES
-          document.getElementById("btnBuscarLead").style.display = "none"
-          document.getElementById("btnBuscarMini").style.display = "block"
+          document.getElementById("btnBuscarLead").style.display = "none";
+          document.getElementById("btnBuscarMini").style.display = "block";
 
-          // INFO
-          document.getElementById("info").style.display = "block"
+          // INFORMACIÓN DEL LEAD
+          document.getElementById("info").style.display = "block";
           document.getElementById("info").innerHTML =
             "Empresa: " + data.lead.empresa +
             "<br>RUC: " + data.lead.ruc +
             "<br>Teléfono: " + data.lead.telefono +
-            "<br>Origen: " + (data.lead.origen || "-")
+            "<br>Origen: " + (data.lead.origen || "-");
 
-          pintarLead(data)
-          crmMensaje("Lead cargado correctamente.", "success")
-          const __crmFinBusqueda = performance.now();
-          console.log("[CRM MEDICIÓN] 3. Procesamiento de interfaz: " + Math.round(__crmFinBusqueda - __crmJSONListo) + " ms");
-          console.log("[CRM MEDICIÓN] 4. TOTAL hasta ficha preparada: " + Math.round(__crmFinBusqueda - __crmInicioBusqueda) + " ms");
+          pintarLead(data);
+
+          crmMensaje("Lead cargado correctamente.", "success");
 
         })
 
-        .catch(() => {
-          document.getElementById("loader").style.display = "none"
-          crmMensaje("No se pudo conectar. Revisa tu conexión e intenta nuevamente.", "error")
-          alert("Error conexión")
+        .catch(error => {
+          console.error("Error al consultar lead:", error);
+          crmMensaje(
+            "No se pudo completar la búsqueda. Verifica tu conexión e inténtalo nuevamente.",
+            "error"
+          );
         })
+
+        .finally(() => {
+          document.getElementById("loader").style.display = "none";
+          crmEstadoBusqueda(false);
+        });
 
     }
+
 
     //FUNCIÓN PARA MOSTRAR LOS ESTADOS DEL LEAD
 
@@ -600,21 +559,6 @@
       document.getElementById("zonaGestion").style.display = "block"
 
       let estado = data.estado
-
-      // La opción PERDIDO nunca debe aparecer si el lead ya tiene una OV.
-      // Se reconstruye el desplegable al consultar cada lead para evitar opciones heredadas.
-      const tieneOVRegistrada = (data.historial || []).some(registro =>
-        String(registro.numOV == null ? "" : registro.numOV).trim() !== ""
-      );
-      const selectorPostCot = document.getElementById("estadoPostCot");
-      selectorPostCot.innerHTML = "";
-      selectorPostCot.add(new Option("Seleccionar Estado", ""));
-      selectorPostCot.add(new Option("CERRADO", "CERRADO"));
-      if (!tieneOVRegistrada && estado !== "CERRADO" && estado !== "PERDIDO") {
-        selectorPostCot.add(new Option("PERDIDO", "PERDIDO"));
-      }
-      selectorPostCot.value = "";
-      document.getElementById("motivoPerdido").value = "";
 
       // 🔴 PRIORIDAD ABSOLUTA: PERDIDO
       estado = data.estado
@@ -739,7 +683,8 @@
 
     //GUARDAR CAMBIOS
     function guardar() {
-      if (crmPeticionActiva) return;
+
+      if (crmGuardando) return;
 
       const id = leadActivo
 
@@ -765,7 +710,7 @@
         !estadoActual.includes("COTIZADO") &&
         !estadoActual.includes("CERRADO")
       ) {
-        alert("Seleccione estado")
+        crmMensaje("Seleccione estado", "error")
         return
       }
 
@@ -778,11 +723,13 @@
         const motivo = document.getElementById("motivoPerdido").value
 
         if (!motivo || motivo.trim() === "") {
-          alert("Ingrese motivo de pérdida")
+          crmMensaje("Ingrese motivo de pérdida", "error")
           return
         }
 
-        crmFetch(URL, {
+        crmEstadoGuardado(true);
+
+        fetch(URL, {
           method: "POST",
           body: JSON.stringify({
             accion: "perdido",
@@ -794,12 +741,20 @@
           .then(r => r.json())
           .then(resp => {
             if (resp.ok) {
-              document.getElementById("msgOk").style.display = "block"
+              crmMensaje("Se guardó la pérdida correctamente.", "success")
               setTimeout(() => buscar(), 1200)
             } else {
-              alert(resp.msg || "No se pudo guardar")
+              crmMensaje(resp.msg || "No se pudo guardar", "error")
             }
           })
+
+          .catch(error => {
+            console.error("Error al guardar pérdida:", error);
+            crmMensaje("Error de conexión al guardar la pérdida", "error");
+          })
+          .finally(() => {
+            crmEstadoGuardado(false);
+          });
 
         return
       }
@@ -810,21 +765,10 @@
 
       //Sección de CERRADO
       if (estadoPost == "CERRADO") {
-        const cotSeleccionada = document.getElementById("listaCotizaciones").value;
-        const ovDeOtraCot = (window.historialLead || []).find(x =>
-          String(x.numOV || "").trim() !== "" &&
-          String(x.numCot || "").trim() !== String(cotSeleccionada).trim()
-        );
-        if (ovDeOtraCot && !ovsDeCotizacion(cotSeleccionada).length) {
-          alert("Este lead ya tiene la OV N° " + ovDeOtraCot.numOV +
-            " vinculada a la cotización N° " + ovDeOtraCot.numCot +
-            ". No se permite registrar una segunda OV.");
-          return;
-        }
 
         const numCot = document.getElementById("listaCotizaciones").value || document.getElementById("numCot").value
         if (!numCot || numCot === "") {
-          alert("Seleccione cotización")
+          crmMensaje("Seleccione cotización", "error")
           document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
           document.querySelector(".btnGuardar").disabled = false
           return
@@ -834,15 +778,10 @@
         const monedaOV = document.getElementById("monedaOV").value
 
         if (!numCot || numCot === "NEW" || !numOV || !montoOV || !monedaOV) {
-          alert("Complete datos de cierre")
+          crmMensaje("Complete datos de cierre", "error")
           document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
           document.querySelector(".btnGuardar").disabled = false
           return
-        }
-
-        if (!crmMontoValido(montoOV)) {
-          alert("El monto de cierre debe ser mayor a cero y tener como máximo 2 decimales.");
-          return;
         }
 
         const selOV = document.getElementById("listaOV").value
@@ -851,13 +790,9 @@
           ? selOV
           : document.getElementById("numOV").value
 
+        crmEstadoGuardado(true);
 
-        if (!numeroDocumentoValido(numCot) || !numeroDocumentoValido(numOVFinal)) {
-          alert("La cotización y la orden de venta deben contener únicamente números.");
-          return;
-        }
-
-        crmFetch(URL, {
+        fetch(URL, {
           method: "POST",
           body: JSON.stringify({
             accion: "ov",
@@ -871,10 +806,8 @@
         })
           .then(r => r.json())
           .then(resp => {
-            document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
-            document.querySelector(".btnGuardar").disabled = false
             if (resp.ok) {
-              document.getElementById("msgOk").style.display = "block"
+              crmMensaje("Se guardó la orden de venta correctamente.", "success")
               setTimeout(() => {
                 document.getElementById("estado").innerHTML = ""
                 document.getElementById("listaCotizaciones").value = ""
@@ -887,8 +820,16 @@
                 buscar()
               }, 1500)
             }
-            if (!resp.ok) alert(resp.msg || "No se pudo guardar la orden de venta");
-          }).catch(() => alert("Error de conexión al guardar la orden de venta"))
+            console.log(resp)
+          })
+
+          .catch(error => {
+            console.error("Error al guardar OV:", error);
+            crmMensaje("Error de conexión al guardar la orden de venta", "error");
+          })
+          .finally(() => {
+            crmEstadoGuardado(false);
+          });
 
         return
       }
@@ -908,8 +849,8 @@
 
         let montoLimpio = monto.replace(",", ".").trim()
 
-        if (!crmMontoValido(monto)) {
-          alert("Monto inválido")
+        if (isNaN(montoLimpio) || montoLimpio === "") {
+          crmMensaje("Monto inválido", "error")
 
           document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
           document.querySelector(".btnGuardar").disabled = false
@@ -932,12 +873,8 @@
           cotFinal = numCot.trim()
         }
 
-        if (cotFinal && !numeroDocumentoValido(cotFinal)) {
-          alert("El número de cotización debe contener únicamente números (0-9).");
-          return;
-        }
         if (!cotFinal) {
-          alert("Número de cotización inválido")
+          crmMensaje("Número de cotización inválido", "error")
 
           document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
           document.querySelector(".btnGuardar").disabled = false
@@ -954,7 +891,7 @@
         })
 
         if (!cotFinal || !moneda || montoLimpio === "" || montoLimpio === null || isNaN(montoLimpio)) {
-          alert("Complete datos cotización")
+          crmMensaje("Complete datos cotización", "error")
 
           document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
           document.querySelector(".btnGuardar").disabled = false
@@ -970,13 +907,14 @@
           tipoMonto: typeof montoLimpio
         })
 
+        crmEstadoGuardado(true);
+
         //-----Estado Cotizado------
-        crmFetch(URL, {
+        fetch(URL, {
           method: "POST",
           body: JSON.stringify({
             accion: "cotizar",
             id: id,
-            filaLead: filaLeadActiva,
             asesor: asesor || null,
             moneda: moneda,
             monto: montoLimpio,
@@ -985,19 +923,13 @@
         })
           .then(r => r.json())
           .then(resp => {
-            // TESTING: diagnóstico recibido del servidor, sin modificar el guardado.
-            console.log("[CRM DIAGNÓSTICO COTIZACIÓN] Respuesta:", resp);
-            console.log("[CRM DIAGNÓSTICO COTIZACIÓN] Etapas servidor:", resp && resp.diagnostico !== undefined ? resp.diagnostico : "No incluido en respuesta");
-
-            document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
-            document.querySelector(".btnGuardar").disabled = false
 
             if (resp.ok) {
 
               document.getElementById("bloqueCotizacion").style.display = "none"
               document.getElementById("bloqueGestionCot").style.display = "block"
 
-              document.getElementById("msgOk").style.display = "block"
+              crmMensaje("Se guardó la cotización correctamente.", "success")
 
               // REFRESH SOLO SECCIÓN
               setTimeout(() => {
@@ -1005,21 +937,20 @@
                 buscar()
               }, 1500)
             } else {
-              alert(resp.msg || "No se pudo guardar")
+              crmMensaje(resp.msg || "No se pudo guardar", "error")
             }
           })
 
-          .catch(() => {
-            alert("Error al guardar cotización")
-            document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
-            document.querySelector(".btnGuardar").disabled = false
+          .catch(error => {
+            console.error("Error al guardar cotización:", error);
+            crmMensaje("Error al guardar cotización", "error");
           })
+          .finally(() => {
+            crmEstadoGuardado(false);
+          });
 
         return
       }
-
-      document.querySelector(".btnGuardar").innerText = "Guardando..."
-      document.querySelector(".btnGuardar").disabled = true
 
       //----- Estado perdido
 
@@ -1048,7 +979,9 @@
         return
       }
 
-      crmFetch(URL, {
+      crmEstadoGuardado(true);
+
+      fetch(URL, {
         method: "POST",
         body: JSON.stringify({
           accion: "atender",
@@ -1060,12 +993,10 @@
         .then(r => r.json())
         .then(resp => {
           if (resp && resp.ok) {
-            document.getElementById("msgOk").style.display = "block"
+            crmMensaje("Se guardó la atención correctamente.", "success")
             document.getElementById("bloqueCotizacion").style.display = "none"
             document.getElementById("bloqueGestionCot").style.display = "block"
 
-            document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
-            document.querySelector(".btnGuardar").disabled = false
             // SI ES ATENDIDO → REFRESH APP
             if (estadoFinal == "ATENDIDO") {
               setTimeout(() => {
@@ -1074,14 +1005,16 @@
             }
           }
           else {
-            alert(resp.msg || "No se pudo guardar")
+            crmMensaje(resp.msg || "No se pudo guardar", "error")
           }
         })
-        .catch(() => {
-          alert("Error conexión")
-          document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
-          document.querySelector(".btnGuardar").disabled = false
+        .catch(error => {
+          console.error("Error al guardar atención:", error);
+          crmMensaje("Error de conexión al guardar la atención", "error");
         })
+        .finally(() => {
+          crmEstadoGuardado(false);
+        });
 
     }
 
@@ -1089,16 +1022,11 @@
     //Función boton para nueva busqueda
 
     function nuevaBusqueda() {
-      if (crmPeticionActiva) return;
-      crmMensaje("", "info");
-      document.getElementById("loader").style.display = "none";
 
       leadActivo = null
-      filaLeadActiva = null
 
       document.getElementById("idLead").readOnly = false
       document.getElementById("idLead").value = ""
-      document.getElementById("idLead").focus()
 
       document.getElementById("btnBuscarLead").style.display = "block"
       document.getElementById("btnBuscarMini").style.display = "none"
@@ -1106,9 +1034,6 @@
       document.getElementById("zonaGestion").style.display = "none"
       document.getElementById("info").style.display = "none"
       document.getElementById("estado").innerHTML = ""
-      document.getElementById("msgOk").style.display = "none"
-      document.getElementById("motivoPerdido").value = ""
-
       window.historialLead = []
       window.dataOVs = {}
 
@@ -1120,7 +1045,6 @@
       document.getElementById("monedaCot").value = ""
       document.getElementById("montoCot").value = ""
       document.getElementById("numCot").value = ""
-      document.getElementById("numCot").readOnly = false
 
       document.getElementById("monedaOV").value = ""
       document.getElementById("montoOV").value = ""
@@ -1215,53 +1139,9 @@
 
       })
 
-    // Mantener la OV vinculada exclusivamente a su cotización de referencia.
-    function limpiarOVSeleccionada() {
-      const lista = document.getElementById("listaOV");
-      lista.innerHTML = "";
-      lista.style.display = "none";
-      ["monedaOV", "montoOV", "numOV"].forEach(id => {
-        const campo = document.getElementById(id);
-        campo.value = "";
-        campo.readOnly = false;
-      });
-      document.getElementById("bloqueOV").style.display = "none";
-    }
-
-    function ovsDeCotizacion(numCot) {
-      return (window.historialLead || []).filter(x =>
-        String(x.numCot || "").trim() === String(numCot || "").trim() &&
-        String(x.numOV || "").trim() !== ""
-      );
-    }
-
-    function prepararOVCotizacion(numCot) {
-      limpiarOVSeleccionada();
-      const lista = document.getElementById("listaOV");
-      const registros = ovsDeCotizacion(numCot);
-      const numeros = [...new Set(registros.map(x => String(x.numOV).trim()))];
-      if (numeros.length) {
-        lista.add(new Option("N° de Orden de Venta", ""));
-        numeros.forEach(n => lista.add(new Option(n, n)));
-        lista.style.display = "block";
-      } else {
-        // Si el lead ya tiene una OV en otra cotización, no precargarla.
-        const tieneOVEnOtraCot = (window.historialLead || []).some(x =>
-          String(x.numOV || "").trim() !== "" &&
-          String(x.numCot || "").trim() !== String(numCot || "").trim()
-        );
-        if (tieneOVEnOtraCot) {
-          lista.add(new Option("Esta cotización no tiene OV", ""));
-          lista.style.display = "block";
-        }
-      }
-    }
-
     document.getElementById("listaCotizaciones").addEventListener("change", function () {
 
       const num = this.value
-      limpiarOVSeleccionada();
-      document.getElementById("estadoPostCot").value = "";
 
       // 🔥 SI ESTÁ EN DEFAULT → OCULTAR TODO
       if (num === "") {
@@ -1316,9 +1196,39 @@
           // estado al final
           document.getElementById("estadoPostCot").style.display = "block"
 
-          // Solo OV vinculadas a esta cotización.
-          prepararOVCotizacion(num);
+          // ===== CARGAR OVS AUTOMÁTICAMENTE =====
+          const selOV = document.getElementById("listaOV")
+          selOV.innerHTML = ""
 
+          const ovs = (window.dataOVs && window.dataOVs[num]) || []
+
+          if (ovs.length > 0) {
+
+            let op0 = document.createElement("option")
+            op0.text = "N° de Orden de Venta"
+            op0.value = ""
+            selOV.add(op0)
+
+            ovs.forEach(o => {
+              let op = document.createElement("option")
+              op.text = o
+              op.value = o
+              selOV.add(op)
+            })
+
+            let opNew = document.createElement("option")
+            opNew.text = "Nueva Orden de Venta"
+            opNew.value = "NEW"
+            selOV.add(opNew)
+
+            selOV.style.display = "block"
+
+          } else {
+            selOV.style.display = "none"
+          }
+          if (document.getElementById("estadoPostCot").value === "CERRADO") {
+            document.getElementById("bloqueOV").style.display = "block"
+          }
         }
 
       }
@@ -1338,29 +1248,6 @@
       }
 
       if (estado === "CERRADO") {
-        const cotSeleccionada = document.getElementById("listaCotizaciones").value;
-        if (!cotSeleccionada || cotSeleccionada === "NEW") {
-          alert("Seleccione una cotización existente antes de cerrar.");
-          this.value = "";
-          return;
-        }
-        prepararOVCotizacion(cotSeleccionada);
-        const ovsActuales = ovsDeCotizacion(cotSeleccionada);
-        const otraOV = (window.historialLead || []).find(x =>
-          String(x.numOV || "").trim() !== "" &&
-          String(x.numCot || "").trim() !== String(cotSeleccionada).trim()
-        );
-        if (!ovsActuales.length && otraOV) {
-          alert("Este lead ya tiene la orden de venta N° " + otraOV.numOV +
-            " vinculada a la cotización N° " + otraOV.numCot +
-            ". No se permite registrar una segunda OV para el mismo lead.");
-          this.value = "";
-          return;
-        }
-        if (ovsActuales.length === 1) {
-          document.getElementById("listaOV").value = String(ovsActuales[0].numOV).trim();
-          document.getElementById("listaOV").dispatchEvent(new Event("change"));
-        }
 
         document.getElementById("bloqueCotizacion").style.display = "none"
         document.getElementById("bloqueOV").style.display = "block"
@@ -1403,8 +1290,7 @@
       }
 
       const ov = window.historialLead.find(x =>
-        String(x.numOV).trim() === String(numOV).trim() &&
-        String(x.numCot).trim() === String(document.getElementById("listaCotizaciones").value).trim()
+        String(x.numOV).trim() === String(numOV).trim()
       )
 
       if (ov) {
