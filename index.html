@@ -415,10 +415,19 @@
 
     function crmEstadoGuardado(activo) {
       const boton = document.querySelector(".btnGuardar");
+      const controlesContexto = [
+        document.getElementById("asesor"),
+        document.getElementById("idLead"),
+        document.getElementById("btnBuscarLead"),
+        document.getElementById("btnBuscarMini")
+      ];
 
       crmGuardando = activo;
       boton.disabled = activo;
       boton.textContent = activo ? "Guardando..." : "Guardar Cambios";
+      controlesContexto.forEach(control => {
+        if (control) control.disabled = activo;
+      });
 
       if (activo) {
         crmMensaje(
@@ -426,6 +435,11 @@
           "info"
         );
       }
+    }
+
+    function crmCancelarGuardado(mensaje) {
+      crmEstadoGuardado(false);
+      crmMensaje(mensaje, "error");
     }
 
     function crmMensaje(texto, tipo = "info") {
@@ -452,6 +466,41 @@
       }
     }
 
+    function limpiarDatosLead() {
+      leadActivo = null;
+      window.historialLead = [];
+      window.dataOVs = {};
+
+      document.getElementById("loader").style.display = "none";
+      document.getElementById("zonaGestion").style.display = "none";
+      document.getElementById("info").style.display = "none";
+      document.getElementById("info").innerHTML = "";
+      document.getElementById("infoLead").innerHTML = "";
+      document.getElementById("estado").innerHTML = "";
+
+      document.getElementById("listaCotizaciones").innerHTML = "";
+      document.getElementById("listaOV").innerHTML = "";
+      document.getElementById("monedaCot").value = "";
+      document.getElementById("montoCot").value = "";
+      document.getElementById("numCot").value = "";
+      document.getElementById("monedaOV").value = "";
+      document.getElementById("montoOV").value = "";
+      document.getElementById("numOV").value = "";
+      document.getElementById("motivoPerdido").value = "";
+      document.getElementById("estadoPostCot").value = "";
+      document.getElementById("estadoAvanzado").value = "";
+      document.getElementById("estadoInicial").value = "";
+      document.getElementById("asesor").value = "";
+
+      document.getElementById("bloqueCotizacion").style.display = "none";
+      document.getElementById("bloqueGestionCot").style.display = "none";
+      document.getElementById("bloqueOV").style.display = "none";
+      document.getElementById("bloquePerdido").style.display = "none";
+      document.getElementById("estadoPostCot").style.display = "none";
+
+      crmMensaje("");
+    }
+
     //FUNCIÓN BUSCAR - CONSULTA DE LEADS
 
     function buscar() {
@@ -466,6 +515,7 @@
         return;
       }
 
+      limpiarDatosLead();
       crmEstadoBusqueda(true);
       document.getElementById("loader").style.display = "block";
 
@@ -554,11 +604,27 @@
 
     function pintarLead(data) {
 
-      document.getElementById("estadoPostCot").style.display = "none"
-      document.getElementById("bloqueGestionCot").style.display = "none"
       document.getElementById("zonaGestion").style.display = "block"
 
       let estado = data.estado
+
+      const camposComerciales = [
+        "bloqueAsesor",
+        "bloqueEstadoInicial",
+        "bloqueEstadoAvanzado",
+        "bloqueGestionCot",
+        "bloqueCotizacion",
+        "estadoPostCot",
+        "bloquePerdido",
+        "bloqueOV"
+      ]
+
+      camposComerciales.forEach(id => {
+        document.getElementById(id).style.display = "none"
+      })
+
+      document.getElementById("asesor").value = data.asesor || ""
+      document.getElementById("motivoPerdido").value = ""
 
       // 🔴 PRIORIDAD ABSOLUTA: PERDIDO
       estado = data.estado
@@ -689,6 +755,13 @@
       const id = leadActivo
 
       const asesor = document.getElementById("asesor").value
+
+      if (!asesor || !asesor.trim()) {
+        crmCancelarGuardado("Seleccione un asesor antes de guardar.")
+        document.getElementById("asesor").focus()
+        return
+      }
+
       const estadoInicial = document.getElementById("estadoInicial").value
       const estadoAvanzado = document.getElementById("estadoAvanzado").value
 
@@ -710,7 +783,7 @@
         !estadoActual.includes("COTIZADO") &&
         !estadoActual.includes("CERRADO")
       ) {
-        crmMensaje("Seleccione estado", "error")
+        crmCancelarGuardado("Seleccione estado")
         return
       }
 
@@ -723,7 +796,7 @@
         const motivo = document.getElementById("motivoPerdido").value
 
         if (!motivo || motivo.trim() === "") {
-          crmMensaje("Ingrese motivo de pérdida", "error")
+          crmCancelarGuardado("Ingrese motivo de pérdida")
           return
         }
 
@@ -768,9 +841,7 @@
 
         const numCot = document.getElementById("listaCotizaciones").value || document.getElementById("numCot").value
         if (!numCot || numCot === "") {
-          crmMensaje("Seleccione cotización", "error")
-          document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
-          document.querySelector(".btnGuardar").disabled = false
+          crmCancelarGuardado("Seleccione cotización")
           return
         }
         const numOV = document.getElementById("numOV").value
@@ -778,9 +849,7 @@
         const monedaOV = document.getElementById("monedaOV").value
 
         if (!numCot || numCot === "NEW" || !numOV || !montoOV || !monedaOV) {
-          crmMensaje("Complete datos de cierre", "error")
-          document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
-          document.querySelector(".btnGuardar").disabled = false
+          crmCancelarGuardado("Complete datos de cierre")
           return
         }
 
@@ -850,10 +919,7 @@
         let montoLimpio = monto.replace(",", ".").trim()
 
         if (isNaN(montoLimpio) || montoLimpio === "") {
-          crmMensaje("Monto inválido", "error")
-
-          document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
-          document.querySelector(".btnGuardar").disabled = false
+          crmCancelarGuardado("Monto inválido")
 
           return
         }
@@ -874,10 +940,7 @@
         }
 
         if (!cotFinal) {
-          crmMensaje("Número de cotización inválido", "error")
-
-          document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
-          document.querySelector(".btnGuardar").disabled = false
+          crmCancelarGuardado("Número de cotización inválido")
 
           return
         }
@@ -891,10 +954,7 @@
         })
 
         if (!cotFinal || !moneda || montoLimpio === "" || montoLimpio === null || isNaN(montoLimpio)) {
-          crmMensaje("Complete datos cotización", "error")
-
-          document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
-          document.querySelector(".btnGuardar").disabled = false
+          crmCancelarGuardado("Complete datos cotización")
 
           return
         }
@@ -961,9 +1021,7 @@
 
         if (estadoPostFinal !== "COTIZADO" && estadoPostFinal !== "CERRADO") {
 
-          document.querySelector(".btnGuardar").innerText = "Guardar Cambios"
-          document.querySelector(".btnGuardar").disabled = false
-
+          crmCancelarGuardado("La acción no es válida para el estado actual del lead.")
           console.warn("Bloqueado flujo ATENDER innecesario")
           return
         }
@@ -975,6 +1033,7 @@
         estadoActual.includes("COTIZADO") ||
         estadoActual.includes("CERRADO")
       ) {
+        crmCancelarGuardado("El lead ya fue gestionado y no puede volver a atenderse.")
         console.warn("ATENDER BLOQUEADO (ya gestionado)")
         return
       }
@@ -1023,6 +1082,7 @@
 
     function nuevaBusqueda() {
 
+      limpiarDatosLead()
       leadActivo = null
 
       document.getElementById("idLead").readOnly = false
@@ -1062,6 +1122,8 @@
       document.getElementById("bloqueOV").style.display = "none"
       document.getElementById("bloquePerdido").style.display = "none"
       document.getElementById("estadoPostCot").style.display = "none"
+
+      document.getElementById("idLead").focus()
 
     }
 
