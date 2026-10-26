@@ -23,19 +23,104 @@
     }
 
     .campo {
-      margin-top: 14px;
+      margin-top: 16px;
     }
 
-    select {
+    .campo-label {
+      display: block;
+      margin: 0 0 8px;
+      color: #123E7A;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .field-error {
+      margin: -2px 0 8px;
+      color: #a32424;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    [aria-invalid="true"] {
+      border-color: #a32424 !important;
+    }
+
+    .modo-cotizacion {
+      display: none;
+      margin: 0 0 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #edf3fb;
+      color: #123E7A;
+      text-align: left;
+    }
+
+    .modo-cotizacion[data-modo="nueva"] {
+      background: #ecf8e9;
+      color: #256a29;
+    }
+
+    .modo-cotizacion strong,
+    .modo-cotizacion span {
+      display: block;
+    }
+
+    .modo-cotizacion span {
+      margin-top: 3px;
+      font-size: 13px;
+    }
+
+    .ov-valores-sugeridos {
+      display: none;
+      margin: 0 0 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #edf3fb;
+      color: #123E7A;
+      font-size: 13px;
+      line-height: 1.4;
+      text-align: left;
+    }
+
+    input,
+    select,
+    textarea {
       width: 100%;
-      padding: 14px;
+      min-height: 52px;
+      margin: 0;
+      padding: 13px 14px;
       border-radius: 14px;
       border: 1px solid #3b3b3b;
-      font-size: 15px;
+      font-size: 16px;
       background: white;
+      outline: none;
     }
 
-    .campo {
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid #7ED957;
+      outline-offset: 3px;
+      border-color: #123E7A;
+      box-shadow: 0 0 0 1px #123E7A;
+    }
+
+    [aria-invalid="true"]:focus-visible {
+      outline-color: #d35b5b;
+      border-color: #a32424;
+      box-shadow: 0 0 0 1px #a32424;
+    }
+
+    .campo input + .campo-label,
+    .campo select + .campo-label {
       margin-top: 14px;
     }
 
@@ -52,11 +137,11 @@
     }
 
     #bloqueCotizacion {
-      margin-bottom: 18px;
+      margin-bottom: 0;
     }
 
     #bloqueGestionCot select {
-      margin-bottom: 10px;
+      margin-bottom: 0;
     }
 
     #estadoPostCot {
@@ -73,7 +158,7 @@
     }
 
     #listaCotizaciones {
-      margin-bottom: 18px;
+      margin-bottom: 0;
       font-weight: bold;
       background: #3168b2;
       color: #fff;
@@ -119,28 +204,17 @@
       margin-bottom: 22px;
     }
 
-    /* INPUT */
-
-    input {
-      width: 100%;
-      padding: 15px;
-      border-radius: 14px;
-      border: 1px solid #444;
-      font-size: 17px;
-      margin: 10px 0;
-      outline: none;
-    }
-
     /* BUTTON */
 
     button {
       width: 100%;
-      padding: 16px;
+      min-height: 52px;
+      padding: 12px 16px;
       border: none;
       border-radius: 14px;
       background: #1f4a83;
       color: white;
-      font-size: 17px;
+      font-size: 16px;
       cursor: pointer;
       transition: .2s;
     }
@@ -155,22 +229,83 @@
     }
 
     #zonaGestion button {
-      margin-top: 22px;
+      margin-top: 24px;
+    }
+
+    #zonaGestion {
+      margin-top: 18px;
+      text-align: left;
+    }
+
+    .seccion-contexto,
+    .seccion-gestion {
+      padding: 18px;
+      border-radius: 16px;
+    }
+
+    .seccion-contexto {
+      background: #f4f7fb;
+      border: 1px solid #d7e2f0;
+    }
+
+    .seccion-gestion {
+      margin-top: 18px;
+      border: 1px solid #dfe5ec;
+      background: #fff;
+      box-shadow: 0 6px 16px rgba(18, 62, 122, .07);
+    }
+
+    .seccion-encabezado {
+      margin-bottom: 14px;
+    }
+
+    .seccion-titulo {
+      margin: 0;
+      color: #123E7A;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+
+    .seccion-ayuda {
+      margin: 4px 0 0;
+      color: #596b82;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .seccion-contexto .box {
+      margin-top: 0;
+      text-align: left;
+    }
+
+    .seccion-gestion .campo:first-of-type {
+      margin-top: 0;
+    }
+
+    .seccion-gestion .btnGuardar {
+      margin-bottom: 0;
+    }
+
+    #btnBuscarLead {
+      margin-top: 16px;
     }
 
     .btn-mini {
       position: absolute;
-      top: 20px;
-      right: 20px;
+      top: 18px;
+      right: 18px;
       background: #1f4e8c;
       color: #fff;
       border: none;
-      padding: 6px 10px;
-      border-radius: 10px;
-      font-size: 11px;
+      min-height: 38px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
       cursor: pointer;
       display: none;
       line-height: 1.2;
+      box-shadow: 0 3px 8px rgba(18, 62, 122, .2);
     }
 
     .btn-mini {
@@ -182,17 +317,27 @@
 
     .loader {
       display: none;
-      margin: 18px 0;
+      margin: 16px 0;
+      color: #123E7A;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
     }
 
     .spinner {
+      display: inline-block;
       width: 28px;
       height: 28px;
       border: 4px solid #ddd;
       border-top: 4px solid #1f4a83;
       border-radius: 50%;
       animation: spin .8s linear infinite;
-      margin: auto;
+      margin: 0 8px 0 0;
+      vertical-align: middle;
+    }
+
+    .loader-text {
+      vertical-align: middle;
     }
 
     @keyframes spin {
@@ -209,11 +354,11 @@
 
     .box {
       background: #dfe6ef;
-      padding: 16px;
+      padding: 14px;
       border-radius: 12px;
       font-weight: bold;
       color: #123E7A;
-      margin-top: 18px;
+      margin-top: 16px;
       display: none;
     }
 
@@ -234,6 +379,34 @@
       font-size: 14px;
       line-height: 1.4;
       text-align: left;
+      align-items: flex-start;
+      gap: 9px;
+    }
+
+    .crm-status::before {
+      display: inline-flex;
+      flex: 0 0 20px;
+      width: 20px;
+      height: 20px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #123e7a;
+      color: #fff;
+      content: "i";
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .crm-status[data-type="success"]::before {
+      content: "✓";
+      background: #256a29;
+    }
+
+    .crm-status[data-type="error"]::before {
+      content: "!";
+      background: #a32424;
     }
 
     .crm-status[data-type="error"] {
@@ -246,6 +419,66 @@
       color: #256a29;
     }
 
+    .lead-resumen {
+      display: none;
+      position: sticky;
+      top: 10px;
+      z-index: 2;
+      margin: 14px 0;
+      padding: 10px 12px;
+      border: 1px solid #b7cce7;
+      border-radius: 12px;
+      background: #f5f9ff;
+      color: #123E7A;
+      box-shadow: 0 4px 12px rgba(18, 62, 122, .12);
+      text-align: left;
+    }
+
+    .lead-resumen-principal {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px 8px;
+    }
+
+    .lead-resumen-id,
+    .lead-resumen-empresa {
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .lead-resumen-empresa {
+      font-weight: 700;
+    }
+
+    .lead-resumen-estado {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #dceafa;
+      font-size: 12px;
+      font-weight: 700;
+    }
+.lead-resumen-estado[data-estado="SIN_GESTIONAR"] {
+  background: #e5e7eb;
+  color: #374151;
+}
+.lead-resumen-estado[data-estado="ATENDIDO"] {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+.lead-resumen-estado[data-estado="COTIZADO"] {
+  background: #fef3c7;
+  color: #92400e;
+}
+.lead-resumen-estado[data-estado="CERRADO"] {
+  background: #dcfce7;
+  color: #166534;
+}
+.lead-resumen-estado[data-estado="PERDIDO"] {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
     button:disabled {
       opacity: 0.68;
       cursor: wait;
@@ -254,19 +487,69 @@
 
     /* MOBILE FULL APP */
 
-    @media(max-width:480px) {
+    @media (min-width: 768px) {
+
+      .app {
+        padding: 40px 24px;
+      }
+
+      .card {
+        max-width: 900px;
+        padding: 36px 40px 42px;
+      }
+
+      .card > .campo-label,
+      #idLead,
+      #btnBuscarLead,
+      #crmStatus {
+        max-width: 520px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      #btnBuscarLead {
+        display: block;
+        margin-top: 16px;
+      }
+
+      #zonaGestion[style*="display: block"] {
+        display: grid !important;
+        grid-template-columns: minmax(250px, .85fr) minmax(0, 1.35fr);
+        gap: 22px;
+        align-items: start;
+      }
+
+      .seccion-gestion {
+        margin-top: 0;
+      }
+    }
+
+    @media (max-width: 767px) {
 
       .app {
         align-items: flex-start;
-        padding: 14px;
+        padding: 0;
       }
 
       .card {
         max-width: 100%;
-        min-height: 100vh;
+        min-height: 100dvh;
         border-radius: 0;
         box-shadow: none;
-        padding-top: 70px;
+        padding: 68px 18px calc(24px + env(safe-area-inset-bottom));
+      }
+
+      .seccion-contexto,
+      .seccion-gestion {
+        padding: 16px;
+      }
+
+      .lead-resumen {
+        top: 8px;
+      }
+
+      #zonaGestion {
+        margin-top: 16px;
       }
 
     }
@@ -284,34 +567,59 @@
       <div class="t2">MKT Ciptech</div>
 
       <!-- BOTON NUEVA BUSQUEDA -->
-      <button id="btnBuscarMini" onclick="nuevaBusqueda()" class="btn-mini">
-        Buscar Lead
+      <button id="btnBuscarMini" onclick="nuevaBusqueda()" class="btn-mini"
+        aria-label="Iniciar una nueva búsqueda de lead" title="Limpiar el lead actual y buscar otro">
+        <span aria-hidden="true">↻</span> Nueva búsqueda
       </button>
 
       <!-- COLOCAR ID DEL LEAD -->
+      <label class="campo-label" for="idLead">ID del lead</label>
       <input id="idLead" placeholder="ID Lead">
 
       <!-- BOTON DE BUSCAR LEAD -->
       <button id="btnBuscarLead" onclick="buscar()">Buscar lead</button>
 
-      <div class="loader" id="loader">
-        <div class="spinner"></div>
+      <div class="loader" id="loader" role="status" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <span class="loader-text">Buscando lead...</span>
       </div>
 
       <div id="crmStatus" class="crm-status" role="status" aria-live="polite"></div>
 
-      <div id="info" class="box"></div>
-      <div id="estado" class="estado"></div>
+      <div id="leadResumen" class="lead-resumen" aria-live="polite">
+        <div class="lead-resumen-principal">
+          <span id="leadResumenId" class="lead-resumen-id"></span>
+          <span aria-hidden="true">·</span>
+          <span id="leadResumenEmpresa" class="lead-resumen-empresa"></span>
+          <span id="leadResumenEstado" class="lead-resumen-estado"></span>
+        </div>
+      </div>
 
       <!-- DESPLEGABLES -->
       <div id="zonaGestion" style="display:none">
 
-        <div class="boxInfo" id="infoLead"></div>
+        <section class="seccion-contexto" aria-labelledby="tituloDatosLead">
+          <div class="seccion-encabezado">
+            <h3 id="tituloDatosLead" class="seccion-titulo">Datos del lead</h3>
+            <p class="seccion-ayuda">Información de referencia para esta gestión.</p>
+          </div>
+          <div id="info" class="box"></div>
+          <div id="estado" class="estado"></div>
+          <div class="boxInfo" id="infoLead"></div>
+        </section>
+
+        <section class="seccion-gestion" aria-labelledby="tituloRegistrarGestion">
+          <div class="seccion-encabezado">
+            <h3 id="tituloRegistrarGestion" class="seccion-titulo">Registrar gestión</h3>
+            <p class="seccion-ayuda">Selecciona la acción y completa únicamente los datos necesarios.</p>
+          </div>
 
         <div id="bloqueAsesor" class="campo">
+          <label class="campo-label" for="asesor">Asesor</label>
           <select id="asesor">
             <option value="">Seleccionar Asesor</option>
             <option>Herson Zevallos</option>
+            <option>Richard Palacios</option>
             <option>Luz Arone</option>
             <option>Peter Sanchez</option>
             <option>Daniel Bravo</option>
@@ -335,6 +643,7 @@
         </div>
 
         <div id="bloqueEstadoInicial" class="campo">
+          <label class="campo-label" for="estadoInicial">Estado inicial</label>
           <select id="estadoInicial">
             <option value="">Seleccionar Estado</option>
             <option>ATENDIDO</option>
@@ -343,6 +652,7 @@
 
         <!-- DROPDOWN DESPUES DE ATENCIÓN -->
         <div id="bloqueEstadoAvanzado" class="campo">
+          <label class="campo-label" for="estadoAvanzado">Siguiente acción</label>
           <select id="estadoAvanzado">
             <option value="">Seleccionar Estado</option>
             <option>COTIZADO</option>
@@ -353,6 +663,7 @@
         <!-- DROPDOWN DESPUES DE COTIZACIÓN -->
         <div id="bloqueGestionCot" class="campo" style="display:none">
 
+          <label class="campo-label" for="listaCotizaciones">N.º de cotización</label>
           <select id="listaCotizaciones"></select>
 
         </div>
@@ -360,43 +671,61 @@
         <!-- CAMPOS PARA COTIZACIÓN -->
         <div id="bloqueCotizacion" class="campo" style="display:none">
 
+          <div id="modoCotizacion" class="modo-cotizacion" aria-live="polite">
+            <strong id="modoCotizacionTitulo"></strong>
+            <span id="modoCotizacionDetalle"></span>
+          </div>
+
+          <label class="campo-label" for="monedaCot">Moneda de cotización</label>
           <select id="monedaCot">
             <option value="">Tipo Moneda</option>
             <option>PEN</option>
             <option>USD</option>
           </select>
 
+          <label class="campo-label" for="montoCot">Monto de cotización</label>
           <input id="montoCot" placeholder="Monto de Cotización">
 
-          <input id="numCot" placeholder="N° de Cotización">
+          <label class="campo-label" for="numCot">N.º de cotización</label>
+          <input id="numCot" type="text" inputmode="numeric" autocomplete="off"
+            maxlength="6" pattern="[0-9]{6}" placeholder="N.º de cotización (6 dígitos)">
 
         </div>
 
-        <select id="estadoPostCot">
-          <option value="">Seleccionar Estado</option>
-          <option>CERRADO</option>
-          <option>PERDIDO</option>
-        </select>
+        <div id="bloqueEstadoPostCot" class="campo" style="display:none">
+          <label class="campo-label" for="estadoPostCot">Resultado comercial</label>
+          <select id="estadoPostCot">
+            <option value="">Seleccionar Estado</option>
+            <option>CERRADO</option>
+            <option>PERDIDO</option>
+          </select>
+        </div>
 
         <div id="bloquePerdido" class="campo" style="display:none">
-          <textarea id="motivoPerdido" placeholder="Motivo de pérdida"
-            style="width:100%;padding:14px;border-radius:14px;border:2px solid #444;font-size:15px;"></textarea>
+          <label class="campo-label" for="motivoPerdido">Motivo de pérdida</label>
+          <textarea id="motivoPerdido" placeholder="Motivo de pérdida"></textarea>
         </div>
 
         <div id="bloqueOV" class="campo" style="display:none">
+          <div id="ovValoresSugeridos" class="ov-valores-sugeridos" aria-live="polite"></div>
           <select id="listaOV" style="display:none"></select>
+          <label class="campo-label" for="monedaOV">Moneda de la orden de venta</label>
           <select id="monedaOV">
             <option value="">Tipo Moneda</option>
             <option>PEN</option>
             <option>USD</option>
           </select>
+          <label class="campo-label" for="montoOV">Monto de cierre</label>
           <input id="montoOV" placeholder="Monto de Cierre">
-          <input id="numOV" placeholder="N° Orden de Venta">
+          <label class="campo-label" for="numOV">N.º de orden de venta</label>
+          <input id="numOV" type="text" inputmode="numeric" autocomplete="off"
+            maxlength="5" pattern="[0-9]{5}" placeholder="N.º de orden de venta (5 dígitos)">
         </div>
 
 
 
         <button class="btnGuardar" onclick="guardar()">Guardar Cambios</button>
+        </section>
       </div>
 
     </div>
@@ -405,13 +734,15 @@
 
   <script>
 
-    const URL = "https://script.google.com/macros/s/AKfycbxLeAdRYsXPRmqvVGM6zoQIaydArRWuGKJg1GFo9BGqorFI0RFMOBEW48hb0XEmlemayA/exec";
+    const URL = "https://script.google.com/macros/s/AKfycbymjhSVRSa3KIekqlyK4g36dQQ-lwJWTesBcpSZbRUziuysdl7Z9qGT-yW1F5qLJLU7/exec";
 
     let leadActivo = null
+    let estadoLeadActivo = ""
 
     let crmBuscando = false;
 
     let crmGuardando = false;
+    let crmRecargaPendiente = null;
 
     function crmEstadoGuardado(activo) {
       const boton = document.querySelector(".btnGuardar");
@@ -442,12 +773,160 @@
       crmMensaje(mensaje, "error");
     }
 
+    function crmMostrarErrorCampo(id, mensaje) {
+      const campo = document.getElementById(id);
+      const errorId = "error-" + id;
+      let error = document.getElementById(errorId);
+
+      if (!error) {
+        error = document.createElement("div");
+        error.id = errorId;
+        error.className = "field-error";
+        campo.insertAdjacentElement("afterend", error);
+      }
+
+      error.textContent = mensaje;
+      campo.setAttribute("aria-invalid", "true");
+      campo.setAttribute("aria-describedby", errorId);
+    }
+
+    function crmLimpiarErrorCampo(id) {
+      const campo = document.getElementById(id);
+      const error = document.getElementById("error-" + id);
+
+      if (error) error.remove();
+      if (campo) {
+        campo.removeAttribute("aria-invalid");
+        campo.removeAttribute("aria-describedby");
+      }
+    }
+
+    function crmLimpiarErroresCampos() {
+      document.querySelectorAll(".field-error").forEach(error => {
+        crmLimpiarErrorCampo(error.id.replace("error-", ""));
+      });
+    }
+
+    function crmCancelarPorCampo(id, mensaje) {
+      crmEstadoGuardado(false);
+      crmMostrarErrorCampo(id, mensaje);
+      document.getElementById(id).focus();
+    }
+
+    function crmModoCotizacion(modo, titulo = "", detalle = "") {
+      const contenedor = document.getElementById("modoCotizacion");
+      document.getElementById("modoCotizacionTitulo").textContent = titulo;
+      document.getElementById("modoCotizacionDetalle").textContent = detalle;
+      contenedor.dataset.modo = modo;
+      contenedor.style.display = modo ? "block" : "none";
+    }
+
+function normalizarEstadoChip(estado) {
+  return String(estado || "").trim().toUpperCase().replace(/\s+/g, "_");
+}
+
+function actualizarResumenLead(lead) {
+      document.getElementById("leadResumenId").textContent = lead.id || "-";
+      document.getElementById("leadResumenEmpresa").textContent = lead.empresa || "-";
+  const chipEstado = document.getElementById("leadResumenEstado");
+  const estado = lead.estado || "-";
+  chipEstado.textContent = estado;
+  chipEstado.dataset.estado = normalizarEstadoChip(estado);
+      document.getElementById("leadResumen").style.display = "block";
+    }
+
+    function limpiarResumenLead() {
+      document.getElementById("leadResumen").style.display = "none";
+      document.getElementById("leadResumenId").textContent = "";
+      document.getElementById("leadResumenEmpresa").textContent = "";
+  const chipEstado = document.getElementById("leadResumenEstado");
+  chipEstado.textContent = "";
+  chipEstado.removeAttribute("data-estado");
+    }
+
     function crmMensaje(texto, tipo = "info") {
       const elemento = document.getElementById("crmStatus");
 
       elemento.textContent = texto;
       elemento.dataset.type = tipo;
-      elemento.style.display = texto ? "block" : "none";
+      elemento.style.display = texto ? "flex" : "none";
+    }
+
+    function formatearTiempoConsulta(milisegundos) {
+      if (milisegundos < 1000) return Math.round(milisegundos) + " ms";
+      return (milisegundos / 1000).toFixed(1).replace(".", ",") + " s";
+    }
+
+    function esIdentificadorNumerico(valor, longitud) {
+      return new RegExp("^\\d{" + longitud + "}$").test(String(valor || "").trim());
+    }
+
+    function limitarCampoANumeros(id, longitud) {
+      const campo = document.getElementById(id);
+      campo.addEventListener("input", function () {
+        campo.value = campo.value.replace(/\D/g, "").slice(0, longitud);
+      });
+    }
+
+    function ocultarValoresSugeridosOV() {
+      const aviso = document.getElementById("ovValoresSugeridos");
+      aviso.textContent = "";
+      aviso.style.display = "none";
+    }
+
+    function sugerirValoresOVDesdeCotizacion() {
+      const numCot = document.getElementById("listaCotizaciones").value;
+      const listaOV = document.getElementById("listaOV");
+      const ovExistenteSeleccionada = listaOV.value && listaOV.value !== "NEW";
+
+      if (!numCot || numCot === "NEW" || ovExistenteSeleccionada) {
+        ocultarValoresSugeridosOV();
+        return;
+      }
+
+      const cotizacion = (window.historialLead || []).find(registro =>
+        String(registro.numCot).trim() === String(numCot).trim()
+      );
+
+      if (!cotizacion) {
+        ocultarValoresSugeridosOV();
+        return;
+      }
+
+      document.getElementById("monedaOV").value = cotizacion.monedaCot || "";
+      document.getElementById("montoOV").value = cotizacion.montoCot || "";
+      document.getElementById("numOV").value = "";
+      document.getElementById("numOV").readOnly = false;
+
+      const aviso = document.getElementById("ovValoresSugeridos");
+      aviso.textContent = "Valores sugeridos desde la cotización " + numCot + ". Puedes modificarlos para esta orden de venta.";
+      aviso.style.display = "block";
+    }
+
+    function reiniciarDependenciasDeCotizacion() {
+      document.getElementById("estadoPostCot").value = "";
+      document.getElementById("bloqueEstadoPostCot").style.display = "none";
+      document.getElementById("bloqueOV").style.display = "none";
+      document.getElementById("bloquePerdido").style.display = "none";
+
+      const listaOV = document.getElementById("listaOV");
+      listaOV.innerHTML = "";
+      listaOV.style.display = "none";
+
+      document.getElementById("monedaOV").value = "";
+      document.getElementById("montoOV").value = "";
+      document.getElementById("numOV").value = "";
+      document.getElementById("numOV").readOnly = false;
+      ocultarValoresSugeridosOV();
+    }
+
+    function crmMensajeConTiempoDeGuardado(mensaje, tipo, inicioGuardado) {
+      const texto = String(mensaje || "").replace(/[.\s]+$/, "");
+      const conector = tipo === "success" ? " en " : " tras ";
+      crmMensaje(
+        texto + conector + formatearTiempoConsulta(performance.now() - inicioGuardado) + ".",
+        tipo
+      );
     }
 
     function crmEstadoBusqueda(activa) {
@@ -470,6 +949,7 @@
       leadActivo = null;
       window.historialLead = [];
       window.dataOVs = {};
+      limpiarResumenLead();
 
       document.getElementById("loader").style.display = "none";
       document.getElementById("zonaGestion").style.display = "none";
@@ -477,6 +957,8 @@
       document.getElementById("info").innerHTML = "";
       document.getElementById("infoLead").innerHTML = "";
       document.getElementById("estado").innerHTML = "";
+      document.getElementById("estado").style.display = "none";
+      estadoLeadActivo = "";
 
       document.getElementById("listaCotizaciones").innerHTML = "";
       document.getElementById("listaOV").innerHTML = "";
@@ -496,14 +978,41 @@
       document.getElementById("bloqueGestionCot").style.display = "none";
       document.getElementById("bloqueOV").style.display = "none";
       document.getElementById("bloquePerdido").style.display = "none";
-      document.getElementById("estadoPostCot").style.display = "none";
+      document.getElementById("bloqueEstadoPostCot").style.display = "none";
+      crmModoCotizacion("");
 
       crmMensaje("");
     }
 
+    function cancelarRecargaLead() {
+      if (crmRecargaPendiente !== null) {
+        clearTimeout(crmRecargaPendiente);
+        crmRecargaPendiente = null;
+      }
+    }
+
+    function programarRecargaLead(esperaMs = 1200, antesDeRecargar) {
+      const idProgramado = leadActivo;
+      if (!idProgramado) return;
+
+      cancelarRecargaLead();
+
+      crmRecargaPendiente = setTimeout(() => {
+        crmRecargaPendiente = null;
+
+        const idEnCampo = document.getElementById("idLead").value.trim();
+        if (crmBuscando || leadActivo !== idProgramado || idEnCampo !== idProgramado) return;
+
+        if (typeof antesDeRecargar === "function") antesDeRecargar();
+        buscar(true);
+      }, esperaMs);
+    }
+
     //FUNCIÓN BUSCAR - CONSULTA DE LEADS
 
-    function buscar() {
+    function buscar(esRecargaProgramada = false) {
+
+      if (!esRecargaProgramada) cancelarRecargaLead();
 
       if (crmBuscando) return;
 
@@ -544,6 +1053,8 @@
       document.getElementById("estadoInicial").value = "";
       document.getElementById("asesor").value = "";
 
+      const inicioConsulta = performance.now();
+
       fetch(URL + "?accion=consultar&id=" + encodeURIComponent(id))
 
         .then(r => {
@@ -554,7 +1065,11 @@
         .then(data => {
 
           if (!data || !data.lead) {
-            crmMensaje("No se encontró un lead con el ID ingresado.", "error");
+            crmMensaje(
+              "No se encontró un lead con el ID ingresado. Consulta completada en " +
+              formatearTiempoConsulta(performance.now() - inicioConsulta) + ".",
+              "error"
+            );
             return;
           }
 
@@ -573,21 +1088,27 @@
           // INFORMACIÓN DEL LEAD
           document.getElementById("info").style.display = "block";
           document.getElementById("info").innerHTML =
-            "Empresa: " + data.lead.empresa +
-            "<br>RUC: " + data.lead.ruc +
+            "RUC: " + data.lead.ruc +
             "<br>Teléfono: " + data.lead.telefono +
-            "<br>Origen: " + (data.lead.origen || "-");
+            "<br>Origen: " + (data.lead.origen || "-") +
+            "<br>Asesor: " + (data.asesor || "-");
 
           pintarLead(data);
 
-          crmMensaje("Lead cargado correctamente.", "success");
+          crmMensaje(
+            "Lead cargado correctamente en " +
+            formatearTiempoConsulta(performance.now() - inicioConsulta) + ".",
+            "success"
+          );
 
         })
 
         .catch(error => {
           console.error("Error al consultar lead:", error);
           crmMensaje(
-            "No se pudo completar la búsqueda. Verifica tu conexión e inténtalo nuevamente.",
+            "No se pudo completar la búsqueda tras " +
+            formatearTiempoConsulta(performance.now() - inicioConsulta) +
+            ". Verifica tu conexión e inténtalo nuevamente.",
             "error"
           );
         })
@@ -607,6 +1128,12 @@
       document.getElementById("zonaGestion").style.display = "block"
 
       let estado = data.estado
+      estadoLeadActivo = estado
+      actualizarResumenLead({
+        id: data.lead.id,
+        empresa: data.lead.empresa,
+        estado: estado
+      })
 
       const camposComerciales = [
         "bloqueAsesor",
@@ -614,7 +1141,7 @@
         "bloqueEstadoAvanzado",
         "bloqueGestionCot",
         "bloqueCotizacion",
-        "estadoPostCot",
+        "bloqueEstadoPostCot",
         "bloquePerdido",
         "bloqueOV"
       ]
@@ -625,6 +1152,7 @@
 
       document.getElementById("asesor").value = data.asesor || ""
       document.getElementById("motivoPerdido").value = ""
+      crmModoCotizacion("")
 
       // 🔴 PRIORIDAD ABSOLUTA: PERDIDO
       estado = data.estado
@@ -674,9 +1202,8 @@
 
       }
 
-      document.getElementById("estado").innerHTML =
-        "Estado Actual: <b>" + estado + "</b><br>" +
-        "Asesor: <b>" + (data.asesor || "-") + "</b>"
+      document.getElementById("estado").innerHTML = ""
+      document.getElementById("estado").style.display = "none"
 
       document.getElementById("bloqueAsesor").style.display = "none"
       document.getElementById("bloqueEstadoInicial").style.display = "none"
@@ -702,7 +1229,7 @@
 
         document.getElementById("bloqueEstadoAvanzado").style.display = "block" // 👈 CLAVE
 
-        document.getElementById("estadoPostCot").style.display = "none"
+        document.getElementById("bloqueEstadoPostCot").style.display = "none"
         document.getElementById("bloqueGestionCot").style.display = "none"
         document.getElementById("bloqueCotizacion").style.display = "none"
 
@@ -710,7 +1237,7 @@
 
       if (estado == "COTIZADO" || estado == "CERRADO") {
 
-        document.getElementById("estadoPostCot").style.display = "block"
+        document.getElementById("bloqueEstadoPostCot").style.display = "block"
         document.getElementById("bloqueGestionCot").style.display = "block"
 
         if (estado == "COTIZADO") {
@@ -752,13 +1279,14 @@
 
       if (crmGuardando) return;
 
+      crmLimpiarErroresCampos()
+
       const id = leadActivo
 
       const asesor = document.getElementById("asesor").value
 
       if (!asesor || !asesor.trim()) {
-        crmCancelarGuardado("Seleccione un asesor antes de guardar.")
-        document.getElementById("asesor").focus()
+        crmCancelarPorCampo("asesor", "Seleccione un asesor antes de guardar.")
         return
       }
 
@@ -775,7 +1303,7 @@
         estadoFinal = "COTIZADO"
       }
 
-      const estadoActual = document.getElementById("estado").innerText
+      const estadoActual = estadoLeadActivo
 
       // Solo exigir estado si NO está ya en COTIZADO
       if (
@@ -783,7 +1311,10 @@
         !estadoActual.includes("COTIZADO") &&
         !estadoActual.includes("CERRADO")
       ) {
-        crmCancelarGuardado("Seleccione estado")
+        const campoEstado = estadoActual.includes("SIN GESTIONAR")
+          ? "estadoInicial"
+          : "estadoAvanzado"
+        crmCancelarPorCampo(campoEstado, "Seleccione un estado.")
         return
       }
 
@@ -796,10 +1327,11 @@
         const motivo = document.getElementById("motivoPerdido").value
 
         if (!motivo || motivo.trim() === "") {
-          crmCancelarGuardado("Ingrese motivo de pérdida")
+          crmCancelarPorCampo("motivoPerdido", "Ingrese el motivo de pérdida.")
           return
         }
 
+        const inicioGuardado = performance.now();
         crmEstadoGuardado(true);
 
         fetch(URL, {
@@ -814,16 +1346,16 @@
           .then(r => r.json())
           .then(resp => {
             if (resp.ok) {
-              crmMensaje("Se guardó la pérdida correctamente.", "success")
-              setTimeout(() => buscar(), 1200)
+              crmMensajeConTiempoDeGuardado("Se guardó la pérdida correctamente", "success", inicioGuardado)
+              programarRecargaLead(1200)
             } else {
-              crmMensaje(resp.msg || "No se pudo guardar", "error")
+              crmMensajeConTiempoDeGuardado(resp.msg || "No se pudo guardar la pérdida", "error", inicioGuardado)
             }
           })
 
           .catch(error => {
             console.error("Error al guardar pérdida:", error);
-            crmMensaje("Error de conexión al guardar la pérdida", "error");
+            crmMensajeConTiempoDeGuardado("Error de conexión al guardar la pérdida", "error", inicioGuardado);
           })
           .finally(() => {
             crmEstadoGuardado(false);
@@ -840,16 +1372,27 @@
       if (estadoPost == "CERRADO") {
 
         const numCot = document.getElementById("listaCotizaciones").value || document.getElementById("numCot").value
-        if (!numCot || numCot === "") {
-          crmCancelarGuardado("Seleccione cotización")
-          return
-        }
         const numOV = document.getElementById("numOV").value
         const montoOV = document.getElementById("montoOV").value
         const monedaOV = document.getElementById("monedaOV").value
 
-        if (!numCot || numCot === "NEW" || !numOV || !montoOV || !monedaOV) {
-          crmCancelarGuardado("Complete datos de cierre")
+        if (!esIdentificadorNumerico(numCot, 6)) {
+          crmCancelarPorCampo("listaCotizaciones", "Seleccione una cotización válida de 6 dígitos.")
+          return
+        }
+
+        if (!esIdentificadorNumerico(numOV, 5)) {
+          crmCancelarPorCampo("numOV", "Ingrese un N.º de orden de venta de 5 dígitos.")
+          return
+        }
+
+        if (!montoOV) {
+          crmCancelarPorCampo("montoOV", "Ingrese el monto de cierre.")
+          return
+        }
+
+        if (!monedaOV) {
+          crmCancelarPorCampo("monedaOV", "Seleccione la moneda de la orden de venta.")
           return
         }
 
@@ -859,6 +1402,7 @@
           ? selOV
           : document.getElementById("numOV").value
 
+        const inicioGuardado = performance.now();
         crmEstadoGuardado(true);
 
         fetch(URL, {
@@ -876,8 +1420,8 @@
           .then(r => r.json())
           .then(resp => {
             if (resp.ok) {
-              crmMensaje("Se guardó la orden de venta correctamente.", "success")
-              setTimeout(() => {
+              crmMensajeConTiempoDeGuardado("Se guardó la orden de venta correctamente", "success", inicioGuardado)
+              programarRecargaLead(1500, () => {
                 document.getElementById("estado").innerHTML = ""
                 document.getElementById("listaCotizaciones").value = ""
                 document.getElementById("estadoPostCot").value = ""
@@ -886,15 +1430,16 @@
                 document.getElementById("numOV").value = ""
                 document.getElementById("montoOV").value = ""
                 document.getElementById("monedaOV").value = ""
-                buscar()
-              }, 1500)
+              })
+            } else {
+              crmMensajeConTiempoDeGuardado(resp.msg || "No se pudo guardar la orden de venta", "error", inicioGuardado)
             }
             console.log(resp)
           })
 
           .catch(error => {
             console.error("Error al guardar OV:", error);
-            crmMensaje("Error de conexión al guardar la orden de venta", "error");
+            crmMensajeConTiempoDeGuardado("Error de conexión al guardar la orden de venta", "error", inicioGuardado);
           })
           .finally(() => {
             crmEstadoGuardado(false);
@@ -919,7 +1464,7 @@
         let montoLimpio = monto.replace(",", ".").trim()
 
         if (isNaN(montoLimpio) || montoLimpio === "") {
-          crmCancelarGuardado("Monto inválido")
+          crmCancelarPorCampo("montoCot", "Ingrese un monto de cotización válido.")
 
           return
         }
@@ -939,8 +1484,9 @@
           cotFinal = numCot.trim()
         }
 
-        if (!cotFinal) {
-          crmCancelarGuardado("Número de cotización inválido")
+        if (!esIdentificadorNumerico(cotFinal, 6)) {
+          const campoCotizacion = selCot && selCot !== "NEW" ? "listaCotizaciones" : "numCot"
+          crmCancelarPorCampo(campoCotizacion, "Ingrese un N.º de cotización de 6 dígitos.")
 
           return
         }
@@ -954,7 +1500,12 @@
         })
 
         if (!cotFinal || !moneda || montoLimpio === "" || montoLimpio === null || isNaN(montoLimpio)) {
-          crmCancelarGuardado("Complete datos cotización")
+          const campoCotizacion = !cotFinal
+            ? "numCot"
+            : !moneda
+              ? "monedaCot"
+              : "montoCot"
+          crmCancelarPorCampo(campoCotizacion, "Complete este campo para guardar la cotización.")
 
           return
         }
@@ -967,6 +1518,7 @@
           tipoMonto: typeof montoLimpio
         })
 
+        const inicioGuardado = performance.now();
         crmEstadoGuardado(true);
 
         //-----Estado Cotizado------
@@ -989,21 +1541,20 @@
               document.getElementById("bloqueCotizacion").style.display = "none"
               document.getElementById("bloqueGestionCot").style.display = "block"
 
-              crmMensaje("Se guardó la cotización correctamente.", "success")
+              crmMensajeConTiempoDeGuardado("Se guardó la cotización correctamente", "success", inicioGuardado)
 
               // REFRESH SOLO SECCIÓN
-              setTimeout(() => {
+              programarRecargaLead(1500, () => {
                 document.getElementById("listaCotizaciones").value = ""
-                buscar()
-              }, 1500)
+              })
             } else {
-              crmMensaje(resp.msg || "No se pudo guardar", "error")
+              crmMensajeConTiempoDeGuardado(resp.msg || "No se pudo guardar la cotización", "error", inicioGuardado)
             }
           })
 
           .catch(error => {
             console.error("Error al guardar cotización:", error);
-            crmMensaje("Error al guardar cotización", "error");
+            crmMensajeConTiempoDeGuardado("Error al guardar cotización", "error", inicioGuardado);
           })
           .finally(() => {
             crmEstadoGuardado(false);
@@ -1038,6 +1589,7 @@
         return
       }
 
+      const inicioGuardado = performance.now();
       crmEstadoGuardado(true);
 
       fetch(URL, {
@@ -1052,24 +1604,22 @@
         .then(r => r.json())
         .then(resp => {
           if (resp && resp.ok) {
-            crmMensaje("Se guardó la atención correctamente.", "success")
+            crmMensajeConTiempoDeGuardado("Se guardó la atención correctamente", "success", inicioGuardado)
             document.getElementById("bloqueCotizacion").style.display = "none"
             document.getElementById("bloqueGestionCot").style.display = "block"
 
-            // SI ES ATENDIDO → REFRESH APP
+            // Mantener el lead abierto y recargar su estado actualizado.
             if (estadoFinal == "ATENDIDO") {
-              setTimeout(() => {
-                nuevaBusqueda()
-              }, 1200)
+              programarRecargaLead(1200)
             }
           }
           else {
-            crmMensaje(resp.msg || "No se pudo guardar", "error")
+            crmMensajeConTiempoDeGuardado(resp.msg || "No se pudo guardar la atención", "error", inicioGuardado)
           }
         })
         .catch(error => {
           console.error("Error al guardar atención:", error);
-          crmMensaje("Error de conexión al guardar la atención", "error");
+          crmMensajeConTiempoDeGuardado("Error de conexión al guardar la atención", "error", inicioGuardado);
         })
         .finally(() => {
           crmEstadoGuardado(false);
@@ -1082,6 +1632,7 @@
 
     function nuevaBusqueda() {
 
+      cancelarRecargaLead()
       limpiarDatosLead()
       leadActivo = null
 
@@ -1121,7 +1672,7 @@
       document.getElementById("bloqueGestionCot").style.display = "none"
       document.getElementById("bloqueOV").style.display = "none"
       document.getElementById("bloquePerdido").style.display = "none"
-      document.getElementById("estadoPostCot").style.display = "none"
+      document.getElementById("bloqueEstadoPostCot").style.display = "none"
 
       document.getElementById("idLead").focus()
 
@@ -1137,6 +1688,7 @@
 
           document.getElementById("bloqueCotizacion").style.display = "block"
           document.getElementById("bloqueGestionCot").style.display = "block"
+          crmModoCotizacion("")
 
           const sel = document.getElementById("listaCotizaciones")
           sel.innerHTML = ""
@@ -1168,6 +1720,7 @@
 
           document.getElementById("bloqueCotizacion").style.display = "none"
           document.getElementById("bloqueGestionCot").style.display = "none"
+          crmModoCotizacion("")
 
           document.getElementById("bloquePerdido").style.display = "block"
 
@@ -1175,6 +1728,7 @@
           document.getElementById("bloqueCotizacion").style.display = "none"
           document.getElementById("bloqueGestionCot").style.display = "none"
           document.getElementById("bloquePerdido").style.display = "none"
+          crmModoCotizacion("")
         }
 
       })
@@ -1204,6 +1758,7 @@
     document.getElementById("listaCotizaciones").addEventListener("change", function () {
 
       const num = this.value
+      reiniciarDependenciasDeCotizacion()
 
       // 🔥 SI ESTÁ EN DEFAULT → OCULTAR TODO
       if (num === "") {
@@ -1213,31 +1768,39 @@
 
         // ✅ SOLO ocultar inputs
         document.getElementById("bloqueCotizacion").style.display = "none"
-        document.getElementById("estadoPostCot").style.display = "block"
+        document.getElementById("bloqueEstadoPostCot").style.display = "none"
         document.getElementById("bloqueOV").style.display = "none"
 
         // limpiar campos
         document.getElementById("monedaCot").value = ""
         document.getElementById("montoCot").value = ""
         document.getElementById("numCot").value = ""
+        crmModoCotizacion("")
+        ocultarValoresSugeridosOV()
 
         return
       }
 
       // reset
-      document.getElementById("estadoPostCot").style.display = "none"
+      document.getElementById("bloqueEstadoPostCot").style.display = "none"
 
       if (num == "NEW") {
 
         document.getElementById("bloqueCotizacion").style.display = "block"
+        ocultarValoresSugeridosOV()
 
         document.getElementById("monedaCot").value = ""
         document.getElementById("montoCot").value = ""
         document.getElementById("numCot").value = ""
         document.getElementById("numCot").readOnly = false
+        crmModoCotizacion(
+          "nueva",
+          "Nueva cotización",
+          "Ingresa el número, la moneda y el monto para crearla."
+        )
 
-        // estado SIEMPRE al final
-        document.getElementById("estadoPostCot").style.display = "block"
+        // Una cotización nueva debe guardarse antes de elegir su resultado comercial.
+        document.getElementById("bloqueEstadoPostCot").style.display = "none"
 
         return
       }
@@ -1254,9 +1817,14 @@
           document.getElementById("montoCot").value = cot.montoCot || ""
           document.getElementById("numCot").value = cot.numCot || ""
           document.getElementById("numCot").readOnly = true
+          crmModoCotizacion(
+            "edicion",
+            "Editar cotización existente",
+            "Cotización " + cot.numCot + ": actualiza moneda o monto."
+          )
 
           // estado al final
-          document.getElementById("estadoPostCot").style.display = "block"
+          document.getElementById("bloqueEstadoPostCot").style.display = "block"
 
           // ===== CARGAR OVS AUTOMÁTICAMENTE =====
           const selOV = document.getElementById("listaOV")
@@ -1290,6 +1858,7 @@
           }
           if (document.getElementById("estadoPostCot").value === "CERRADO") {
             document.getElementById("bloqueOV").style.display = "block"
+            sugerirValoresOVDesdeCotizacion()
           }
         }
 
@@ -1305,6 +1874,7 @@
         document.getElementById("bloquePerdido").style.display = "none"
       }
       document.getElementById("bloqueOV").style.display = "none"
+      if (estado !== "CERRADO") ocultarValoresSugeridosOV()
       if (this.value === "CERRADO") {
         document.getElementById("bloqueEstadoAvanzado").style.display = "none"
       }
@@ -1313,6 +1883,7 @@
 
         document.getElementById("bloqueCotizacion").style.display = "none"
         document.getElementById("bloqueOV").style.display = "block"
+        sugerirValoresOVDesdeCotizacion()
 
       }
 
@@ -1321,17 +1892,19 @@
         document.getElementById("bloqueCotizacion").style.display = "none"
         document.getElementById("bloqueOV").style.display = "none"
         document.getElementById("bloquePerdido").style.display = "block"
+        ocultarValoresSugeridosOV()
 
       }
 
       if (estado === "COTIZADO") {
 
-        document.getElementById("estadoPostCot").style.display = "none"
+        document.getElementById("bloqueEstadoPostCot").style.display = "none"
 
         document.getElementById("bloqueGestionCot").style.display = "block"
         document.getElementById("bloqueCotizacion").style.display = "block"
         document.getElementById("bloqueOV").style.display = "none"
         document.getElementById("bloquePerdido").style.display = "none"
+        ocultarValoresSugeridosOV()
 
       }
 
@@ -1342,11 +1915,7 @@
       const numOV = this.value
 
       if (!numOV || numOV == "NEW") {
-
-        document.getElementById("monedaOV").value = ""
-        document.getElementById("montoOV").value = ""
-        document.getElementById("numOV").value = ""
-        document.getElementById("numOV").readOnly = false
+        sugerirValoresOVDesdeCotizacion()
         return
 
       }
@@ -1361,10 +1930,14 @@
         document.getElementById("montoOV").value = ov.montoOV || ""
         document.getElementById("numOV").value = ov.numOV || ""
         document.getElementById("numOV").readOnly = true
+        ocultarValoresSugeridosOV()
 
       }
 
     })
+
+    limitarCampoANumeros("numCot", 6)
+    limitarCampoANumeros("numOV", 5)
 
     document.getElementById("idLead")
       .addEventListener("keypress", function (e) {
@@ -1375,6 +1948,13 @@
         }
 
       })
+
+    const eventosDeCampo = ["input", "change"]
+    eventosDeCampo.forEach(evento => {
+      document.addEventListener(evento, function (e) {
+        if (e.target.id) crmLimpiarErrorCampo(e.target.id)
+      })
+    })
 
   </script>
 
