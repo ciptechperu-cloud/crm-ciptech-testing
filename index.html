@@ -43,6 +43,45 @@
       text-align: left;
     }
 
+    .seguimiento-panel {
+      display: none;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #d8e2ef;
+    }
+
+    .seguimiento-actual {
+      display: none;
+      margin: 0 0 14px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #edf7ea;
+      color: #176b2c;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .seguimiento-campos {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .seguimiento-campos .campo {
+      margin-top: 0;
+    }
+
+    .btnSeguimiento {
+      width: 100%;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 640px) {
+      .seguimiento-campos {
+        grid-template-columns: 1fr;
+      }
+    }
+
     [aria-invalid="true"] {
       border-color: #a32424 !important;
     }
@@ -722,9 +761,48 @@
             maxlength="5" pattern="[0-9]{5}" placeholder="N.º de orden de venta (5 dígitos)">
         </div>
 
+        <section id="bloqueSeguimiento" class="seguimiento-panel" aria-labelledby="tituloSeguimiento">
+          <div class="seccion-encabezado">
+            <h4 id="tituloSeguimiento" class="seccion-titulo">Próxima acción</h4>
+            <p class="seccion-ayuda">Programa un recordatorio sin cambiar el estado comercial del lead.</p>
+          </div>
+
+          <div id="seguimientoActual" class="seguimiento-actual" aria-live="polite"></div>
+
+          <div class="seguimiento-campos">
+            <div class="campo">
+              <label class="campo-label" for="accionSeguimiento">Acción</label>
+              <select id="accionSeguimiento">
+                <option value="">Seleccionar acción</option>
+                <option value="LLAMAR">Llamar</option>
+                <option value="ENVIAR PROPUESTA">Enviar propuesta</option>
+                <option value="VISITAR">Visitar</option>
+                <option value="REUNIÓN">Reunión</option>
+                <option value="OTRO">Otro</option>
+              </select>
+            </div>
+
+            <div class="campo">
+              <label class="campo-label" for="fechaSeguimiento">Fecha de seguimiento</label>
+              <input id="fechaSeguimiento" type="date">
+            </div>
+
+            <div class="campo">
+              <label class="campo-label" for="horaSeguimiento">Hora</label>
+              <input id="horaSeguimiento" type="time">
+            </div>
+
+            <div class="campo">
+              <label class="campo-label" for="comentarioSeguimiento">Nota (opcional)</label>
+              <input id="comentarioSeguimiento" maxlength="300" placeholder="Ej.: confirmar reunión con gerencia">
+            </div>
+          </div>
+
+          <button id="btnProgramarSeguimiento" type="button" class="btnGuardar btnSeguimiento" onclick="programarSeguimiento()">Programar seguimiento</button>
+        </section>
 
 
-        <button class="btnGuardar" onclick="guardar()">Guardar Cambios</button>
+        <button id="btnGuardarCambios" class="btnGuardar" onclick="guardar()">Guardar Cambios</button>
         </section>
       </div>
 
@@ -745,12 +823,13 @@
     let crmRecargaPendiente = null;
 
     function crmEstadoGuardado(activo) {
-      const boton = document.querySelector(".btnGuardar");
+      const boton = document.getElementById("btnGuardarCambios");
       const controlesContexto = [
         document.getElementById("asesor"),
         document.getElementById("idLead"),
         document.getElementById("btnBuscarLead"),
-        document.getElementById("btnBuscarMini")
+        document.getElementById("btnBuscarMini"),
+        document.getElementById("btnProgramarSeguimiento")
       ];
 
       crmGuardando = activo;
@@ -765,6 +844,28 @@
           "Guardando los cambios. No cierres esta ventana.",
           "info"
         );
+      }
+    }
+
+    function crmEstadoProgramacion(activo) {
+      const boton = document.getElementById("btnProgramarSeguimiento");
+      const controlesContexto = [
+        document.getElementById("asesor"),
+        document.getElementById("idLead"),
+        document.getElementById("btnBuscarLead"),
+        document.getElementById("btnBuscarMini"),
+        document.getElementById("btnGuardarCambios")
+      ];
+
+      crmGuardando = activo;
+      boton.disabled = activo;
+      boton.textContent = activo ? "Programando..." : "Programar seguimiento";
+      controlesContexto.forEach(control => {
+        if (control) control.disabled = activo;
+      });
+
+      if (activo) {
+        crmMensaje("Programando el seguimiento. No cierres esta ventana.", "info");
       }
     }
 
@@ -969,6 +1070,13 @@ function actualizarResumenLead(lead) {
       document.getElementById("montoOV").value = "";
       document.getElementById("numOV").value = "";
       document.getElementById("motivoPerdido").value = "";
+      document.getElementById("accionSeguimiento").value = "";
+      document.getElementById("fechaSeguimiento").value = "";
+      document.getElementById("horaSeguimiento").value = "";
+      document.getElementById("comentarioSeguimiento").value = "";
+      document.getElementById("seguimientoActual").textContent = "";
+      document.getElementById("seguimientoActual").style.display = "none";
+      document.getElementById("bloqueSeguimiento").style.display = "none";
       document.getElementById("estadoPostCot").value = "";
       document.getElementById("estadoAvanzado").value = "";
       document.getElementById("estadoInicial").value = "";
@@ -1075,6 +1183,7 @@ function actualizarResumenLead(lead) {
 
           window.historialLead = data.historial;
           window.dataOVs = data.ovs;
+           window.proximoSeguimiento = data.proximoSeguimiento || null;
 
           leadActivo = id;
 
@@ -1149,6 +1258,9 @@ function actualizarResumenLead(lead) {
       camposComerciales.forEach(id => {
         document.getElementById(id).style.display = "none"
       })
+
+       document.getElementById("bloqueSeguimiento").style.display = "block"
+       pintarProximoSeguimiento(data.proximoSeguimiento)
 
       document.getElementById("asesor").value = data.asesor || ""
       document.getElementById("motivoPerdido").value = ""
@@ -1272,6 +1384,102 @@ function actualizarResumenLead(lead) {
 
       }
 
+    }
+
+    function formatearFechaSeguimiento(fecha) {
+      const partes = String(fecha || "").split("-");
+      return partes.length === 3 ? partes[2] + "/" + partes[1] + "/" + partes[0] : fecha;
+    }
+
+    function pintarProximoSeguimiento(seguimiento) {
+      const aviso = document.getElementById("seguimientoActual");
+
+      if (!seguimiento) {
+        aviso.textContent = "Aún no hay una próxima acción programada para este lead.";
+        aviso.style.display = "block";
+        return;
+      }
+
+      const fecha = formatearFechaSeguimiento(seguimiento.fechaProgramada);
+      const hora = seguimiento.horaProgramada ? " a las " + seguimiento.horaProgramada : "";
+      aviso.textContent = "Próxima acción: " + seguimiento.accion + " el " + fecha + hora + ".";
+      aviso.style.display = "block";
+    }
+
+    function programarSeguimiento() {
+      if (crmGuardando || crmBuscando) return;
+
+      crmLimpiarErroresCampos();
+
+      const asesor = document.getElementById("asesor").value.trim();
+      const accion = document.getElementById("accionSeguimiento").value;
+      const fecha = document.getElementById("fechaSeguimiento").value;
+      const hora = document.getElementById("horaSeguimiento").value;
+      const comentario = document.getElementById("comentarioSeguimiento").value.trim();
+
+      if (!asesor) {
+        crmMostrarErrorCampo("asesor", "Seleccione un asesor antes de programar el seguimiento.");
+        document.getElementById("asesor").focus();
+        return;
+      }
+      if (!accion) {
+        crmMostrarErrorCampo("accionSeguimiento", "Seleccione la próxima acción.");
+        document.getElementById("accionSeguimiento").focus();
+        return;
+      }
+      if (!fecha) {
+        crmMostrarErrorCampo("fechaSeguimiento", "Seleccione la fecha de seguimiento.");
+        document.getElementById("fechaSeguimiento").focus();
+        return;
+      }
+      if (!hora) {
+        crmMostrarErrorCampo("horaSeguimiento", "Seleccione la hora de seguimiento.");
+        document.getElementById("horaSeguimiento").focus();
+        return;
+      }
+
+      const inicioGuardado = performance.now();
+      crmEstadoProgramacion(true);
+
+      fetch(URL, {
+        method: "POST",
+        body: JSON.stringify({
+          accion: "programar_seguimiento",
+          id: leadActivo,
+          asesor: asesor,
+          accionSeguimiento: accion,
+          fechaSeguimiento: fecha,
+          horaSeguimiento: hora,
+          comentario: comentario
+        })
+      })
+        .then(r => r.json())
+        .then(resp => {
+          if (!resp || !resp.ok) {
+            crmMensajeConTiempoDeGuardado((resp && resp.msg) || "No se pudo programar el seguimiento", "error", inicioGuardado);
+            return;
+          }
+
+          const seguimiento = resp.seguimiento || {
+            accion: accion,
+            fechaProgramada: fecha,
+            horaProgramada: hora
+          };
+          window.proximoSeguimiento = seguimiento;
+          pintarProximoSeguimiento(seguimiento);
+          document.getElementById("accionSeguimiento").value = "";
+          document.getElementById("fechaSeguimiento").value = "";
+          document.getElementById("horaSeguimiento").value = "";
+          document.getElementById("comentarioSeguimiento").value = "";
+          crmMensajeConTiempoDeGuardado("Seguimiento programado correctamente", "success", inicioGuardado);
+        })
+        .catch(error => {
+          console.error("Error al programar seguimiento:", error);
+          crmMensajeConTiempoDeGuardado("Error de conexión al programar el seguimiento", "error", inicioGuardado);
+        })
+        .finally(() => {
+          crmEstadoProgramacion(false);
+        });
     }
 
     //GUARDAR CAMBIOS
